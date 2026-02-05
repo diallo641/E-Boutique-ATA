@@ -39,10 +39,17 @@ const deleteRole = async (id) => {
   return result.affectedRows;
 };
 
+// Vérifier si un rôle existe par nom
+const getRoleByName = async (nom_role) => {
+  const [rows] = await db.query("SELECT * FROM role WHERE Nom_role = ?", [nom_role]);
+  return rows[0]; // retourne le rôle ou undefined
+};
+
 module.exports = {
   getAllRoles,
   getRoleById,
   createRole,
   updateRole,
   deleteRole,
+  getRoleByName
 };
