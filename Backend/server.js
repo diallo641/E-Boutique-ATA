@@ -5,16 +5,22 @@ const dotenv = require('dotenv');
 const db = require('./config/db'); 
 dotenv.config();
 const app = express();
+const roleRoutes = require('./routes/role');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+
+
+
 // Route test
 app.get("/", (req, res) => {
   res.send("✅ API fonctionne !");
 });
+// Importer les routes
+app.use('/api/roles', roleRoutes);
 
 // Test connexion à la base au démarrage
 db.getConnection()
