@@ -45,6 +45,15 @@ const getClientByCompteID = async (ID_compte) => {
     return rows[0];
 };
 
+//Pour avoir un numero de telephone unique
+const getClientByTelephone = async (telephone) => {
+    const [rows] = await db.query(
+        `SELECT * FROM client WHERE Telephone = ?`,
+        [telephone]
+    );
+    return rows[0];
+};
+
 // Exporter les fonctions
 module.exports = {
     createClient,
@@ -52,5 +61,6 @@ module.exports = {
     getClientByID,
     updateClient,
     deleteClient,
-    getClientByCompteID
+    getClientByCompteID,
+    getClientByTelephone 
 };
