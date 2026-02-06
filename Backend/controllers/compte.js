@@ -24,7 +24,7 @@ exports.createCompte = async (req, res) => {
             return res.status(404).json({ message: "Rôle inexistant" });
         }
 
-        const passwordHash = await bcrypt.hash(Mot_de_passe, 20);
+        const passwordHash = await bcrypt.hash(Mot_de_passe, 10);
         const compte = await CompteModel.createCompte(Email, passwordHash, ID_role);
 
         res.status(201).json({
@@ -109,7 +109,7 @@ exports.updateCompte = async (req, res) => {
         // Hash uniquement si mot de passe fourni
         let passwordHash = compteExistant.Mot_de_passe;
         if (Mot_de_passe) {
-            passwordHash = await bcrypt.hash(Mot_de_passe, 20);
+            passwordHash = await bcrypt.hash(Mot_de_passe, 10);
         }
 
         const compteMaj = await CompteModel.updateCompte(
