@@ -2,163 +2,152 @@ const CompteModel = require('../models/compte');
 const bcrypt = require('bcrypt');
 const RoleModel = require('../models/role');
 
-//Ajouter un compte
-exports.createCompte = async (req, res) => 
-{
-    try{
-        const {Email, Mot_de_passe, ID_role} = req.body;
-        if(!Email || !Mot_de_passe || !ID_role) {
-            return res.status(400).json({ error: 'Tous les champs sont requis' });
-        }
-        else{
-            //Verifier l'existance de l'email
-            const emailexistant = await CompteModel.getCompteByEmail(Email)
-            if(emailexistant)
-            {
-                return res.status(409).json({message: "Un compte avec cet email existe déjà"})
-            }
-            else
-            {
-                //On verifie l'existance du role
-                const roleexistant = await RoleModel.getRoleById(ID_role);
-                if(!roleexistant)
-                {
-                    return res.status(409).json({message: "Le rôle spécifié n'existe pas"})
-                }
-                else
-                {
-                    const salsround= 20;
-                    const hacherpassword = await bcrypt.hash(Mot_de_passe, salsround);
-                    const nouveaucompte = await CompteModel.createCompte(Email, hacherpassword, ID_role);
-                    return res.status(200).json({message: "Compte créé avec succès", 
-                                                 Compte: {ID_compte: nouveaucompte.insertId,
-                                                          Email: nouveaucompte.Email,
-                                                          ID_role: nouveaucompte.ID_role
-                                                 }
-                    })
-                }
-            }
-        }
 
-    }
-    catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la création du compte' });
-    }
-};
-
-//Recuperer tous les comptes
-exports.getAllComptes = async(req, res) =>
-{
-    try{
-        const comptes = await CompteModel.getAllComptes();
-        if(comptes.length==0)
-        {
-            return res.status(404).json({message: "Aucun compte trouvé"})
-        }
-        else{
-            return res.status(200).json({message: "Comptes récupérés avec succès",
-                                        comptes,
-                                        Tailles: comptes.length
-            })
-        }
-
-    }
-    catch(error){
-        return res.status(500).json({message: error.message})
-    }
-}
-
-//recuperer un seul compte
-exports.getCompteByID = async(req, res) =>
-{
-    try{
-        const id = req.params.id;
-        if (isNaN(id) || id <= 0)
-        {
-            return res.status(400).json({ message: "ID invalide, doit être un entier positif" });
-        }
-        const comptechercher = await CompteModel.getCompteByID(id)
-        if(!comptechercher)
-        {
-            return res.status(404).json({message: "Compte non trouvé"})
-        }
-        else
-        {
-            return res.status(200).json({message: "Compte récupéré avec succès", comptechercher})
-        }
-
-    }
-    catch(error){
-        return res.status(500).json({message: error.message})
-    }
-
-};
-
-//Modifier un compte 
-exports.updateCompte = async(req, res) =>
-{
-    try{
-        const id = parseInt(req.params.id);
+// Ajouter un compte
+exports.createCompte = async (req, res) => {
+    try {
         const { Email, Mot_de_passe, ID_role } = req.body;
-         if (isNaN(id) || id <= 0)
-        {
-            return res.status(400).json({ message: "ID invalide, doit être un entier positif" });
+
+        if (!Email || !Mot_de_passe || !ID_role) {
+            return res.status(400).json({ message: "Tous les champs sont requis" });
         }
-        //Verifier si le compte existe 
-        const compteexistant = await CompteModel.getCompteByID(ID_role);
-        if(!compteexistant)
-        {
+
+        // Vérifier email
+        const emailExistant = await CompteModel.getCompteByEmail(Email);
+        if (emailExistant) {
+            return res.status(409).json({ message: "Email déjà utilisé" });
+        }
+
+        // Vérifier rôle
+        const roleExistant = await RoleModel.getRoleById(ID_role);
+        if (!roleExistant) {
+            return res.status(404).json({ message: "Rôle inexistant" });
+        }
+
+        const passwordHash = await bcrypt.hash(Mot_de_passe, 20);
+        const compte = await CompteModel.createCompte(Email, passwordHash, ID_role);
+
+        res.status(201).json({
+            message: "Compte créé avec succès",
+            compte
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+// Tous les comptes (avec nom du rôle)
+exports.getAllComptes = async (req, res) => {
+    try {
+        const comptes = await CompteModel.getAllComptes();
+
+        if (comptes.length === 0) {
+            return res.status(404).json({ message: "Aucun compte trouvé" });
+        }
+
+        res.status(200).json({
+            message: "Comptes récupérés",
+            total: comptes.length,
+            comptes
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// =====================
+// Un compte par ID
+// =====================
+exports.getCompteByID = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({ message: "ID invalide" });
+        }
+
+        const compte = await CompteModel.getCompteByID(id);
+        if (!compte) {
             return res.status(404).json({ message: "Compte non trouvé" });
         }
-        else
-        {
-            //verifier le role
-            const roleexistant = await RoleModel.getRoleById(id);
-            if(!roleexistant)
-            {
-                return res.status(404).json({ message: "Rôle inexistant" });
-            }
-            else
-            {
-                const hacherpassword = await bcrypt.hash(Mot_de_passe, 20);
-                const UpdatedCompte = await CompteModel.updateCompte(
-                    id, Email, hacherpassword, ID_role
-                )
-                return res.status(200).json({message: "Compte mis à jour avec succès", 
-                                            Compte: UpdatedCompte
-                })
-            }
-        }
 
+        res.status(200).json(compte);
 
-    }
-    catch(error){
-        return res.status(500).json({message: error.message})
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
-//Supprimer un compte
-exports.deleteCompte = async(req, res) =>
-{
-    try
-    {
+// =====================
+// Modifier un compte
+// =====================
+exports.updateCompte = async (req, res) => {
+    try {
         const id = parseInt(req.params.id);
-         if (isNaN(id) || id <= 0)
-        {
-            return res.status(400).json({ message: "ID invalide, doit être un entier positif" });
-        }
-        const comptesupprimer = await CompteModel.deleteCompte(id);
-        if(!comptesupprimer)
-        {
-            return res.status(404).json({message: "Compte non trouvé"})
-        }
-        else
-        {
-            res.status(200).json(comptesupprimer);
+        const { Email, Mot_de_passe, ID_role } = req.body;
+
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({ message: "ID invalide" });
         }
 
+        const compteExistant = await CompteModel.getCompteByID(id);
+        if (!compteExistant) {
+            return res.status(404).json({ message: "Compte non trouvé" });
+        }
+
+        // Vérifier rôle si fourni
+        if (ID_role) {
+            const roleExistant = await RoleModel.getRoleById(ID_role);
+            if (!roleExistant) {
+                return res.status(404).json({ message: "Rôle inexistant" });
+            }
+        }
+
+        // Hash uniquement si mot de passe fourni
+        let passwordHash = compteExistant.Mot_de_passe;
+        if (Mot_de_passe) {
+            passwordHash = await bcrypt.hash(Mot_de_passe, 20);
+        }
+
+        const compteMaj = await CompteModel.updateCompte(
+            id,
+            Email || compteExistant.Email,
+            passwordHash,
+            ID_role || compteExistant.ID_role
+        );
+
+        res.status(200).json({
+            message: "Compte mis à jour",
+            compte: compteMaj
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-    catch(error){
-        return res.status(500).json({message: error.message})
+};
+
+// =====================
+// Supprimer un compte
+// =====================
+exports.deleteCompte = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({ message: "ID invalide" });
+        }
+
+        const deleted = await CompteModel.deleteCompte(id);
+        if (!deleted) {
+            return res.status(404).json({ message: "Compte non trouvé" });
+        }
+
+        res.status(200).json({ message: "Compte supprimé" });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-}
+};
