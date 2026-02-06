@@ -7,6 +7,7 @@ dotenv.config();
 const app = express();
 const roleRoutes = require('./routes/role');
 const compteRoutes= require("./routes/compte");
+const clientRoutes = require('./routes/client');
 
 // Middleware
 app.use(cors());
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 // Importer les routes
 app.use('/api/roles', roleRoutes);
 app.use("/api/comptes", compteRoutes);
+app.use("/api/clients", clientRoutes);
 
 // Test connexion à la base au démarrage
 db.getConnection()
