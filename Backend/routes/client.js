@@ -3,7 +3,7 @@ const router = express.Router();
 const clientController = require('../controllers/client');
 
 //Ajouter un client
-router.post("/ajouterclient", clientController.createClient);
+router.post("/ajouterclient", clientController.createclient);
 //Lister les clients
 router.get('/getAllClients', clientController.getAllClients);
 //Un client
