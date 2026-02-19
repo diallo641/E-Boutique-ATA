@@ -6,7 +6,7 @@ const createClient = async (Nom, Adresse, Telephone, ID_compte) => {
         "INSERT INTO client (Nom, Adresse, Telephone, ID_compte) VALUES (?, ?, ?, ?)", 
         [Nom, Adresse, Telephone, ID_compte]
     );
-    return { insertId: result.insertId, 
+    return { ID_client: result.insertId, 
              Nom, Adresse, Telephone, ID_compte };
 };
 
