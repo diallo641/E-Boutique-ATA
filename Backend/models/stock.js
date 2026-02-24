@@ -53,6 +53,22 @@ const getStockByBoutique = async(ID_boutique) =>
     const [rows] = await db.query("select * from stock where ID_boutique = ?", [ID_boutique]);
     return rows;
 };
+
+const getStockByBoutique1 = async (ID_boutique) =>
+{
+    const [rows] = await db.query(`
+        SELECT 
+            s.Quantite,
+            p.Nom_produit,
+            b.Nom_boutique
+        FROM stock s
+        JOIN produit p ON s.ID_produit = p.ID_produit
+        JOIN boutique b ON s.ID_boutique = b.ID_boutique
+        WHERE s.ID_boutique = ?
+    `, [ID_boutique]);
+
+    return rows;
+};
 //Avoir le stock d'un produit dans une boutique
 const getStockByProductAndBoutique = async(ID_produit, ID_boutique) =>
 {
@@ -71,5 +87,6 @@ module.exports =
     deleteStock,
     getStockByProductID,
     getStockByBoutique,
+    getStockByBoutique1,
     getStockByProductAndBoutique
 };
