@@ -11,6 +11,7 @@ const clientRoutes = require('./routes/client');
 const boutiqueRoutes = require('./routes/boutique');
 const categorieRoutes = require('./routes/categorie');
 const produitRoutes = require('./routes/produit');
+const stockRoutes = require('./routes/stock');
 
 // Middleware
 app.use(cors());
@@ -31,6 +32,7 @@ app.use("/api/clients", clientRoutes);
 app.use("/api/boutiques", boutiqueRoutes);
 app.use("/api/categories", categorieRoutes);
 app.use("/api/produits", produitRoutes);
+app.use("/api/stocks", stockRoutes);
 
 // Test connexion à la base au démarrage
 db.getConnection()
