@@ -68,6 +68,20 @@ const getStockByBoutique = async (req, res) => {
     }
 };
 
+const getStockByBoutique1 = async (req, res) => {
+    try {
+        const { ID_boutique } = req.params;
+        const stocks = await stockModel.getStockByBoutique(ID_boutique);
+        return res.status(200).json({
+            message: stocks.length === 0 ? "Aucun stock trouvé pour cette boutique" : "Stocks récupérés avec succès",
+            total: stocks.length,
+            Stocks: stocks
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Erreur lors de la récupération du stock", error: error.message });
+    }
+};
+
 // Récupérer un stock par produit et boutique (clé composite)
 const getStockByProductAndBoutique = async (req, res) => {
     try {
@@ -132,5 +146,6 @@ module.exports = {
     getStockByBoutique,
     getStockByProductAndBoutique,
     updateStock,
-    deleteStock
+    deleteStock,
+    getStockByBoutique1
 };
