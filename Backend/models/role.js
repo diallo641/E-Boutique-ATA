@@ -42,7 +42,7 @@ const deleteRole = async (id) => {
 // Vérifier si un rôle existe par nom
 const getRoleByName = async (nom_role) => {
   const [rows] = await db.query("SELECT * FROM role WHERE Nom_role = ?", [nom_role]);
-  return rows[0]; // retourne le rôle ou undefined
+  return rows[0]; 
 };
 
 module.exports = {
