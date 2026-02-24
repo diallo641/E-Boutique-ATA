@@ -16,6 +16,7 @@ router.delete("/deletestock/:ID_produit/:ID_boutique", stockController.deleteSto
 router.get("/stockproduit/:ID_produit", stockController.getStockByProductID);
 //Stock des boutiques
 router.get("/stockboutique/:ID_boutique", stockController.getStockByBoutique);
+router.get("/stockboutique1/:ID_boutique", stockController.getStockByBoutique1);
 //Stock d'un produit dans une boutique
 router.get("/stockproduitboutique/:ID_produit/:ID_boutique", stockController.getStockByProductAndBoutique);
 
