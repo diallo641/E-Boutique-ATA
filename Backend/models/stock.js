@@ -77,6 +77,24 @@ const getStockByProductAndBoutique = async(ID_produit, ID_boutique) =>
     return rows[0];
 };
 
+// decrementation du stock
+const decrement_stock = async(ID_produit, ID_boutique, quantite) => {
+    const stockActuel = await getStockByProductAndBoutique(ID_produit, ID_boutique);
+    if(!stockActuel) throw new Error("produit non trouvé en stock");
+    const nouvelleQuantite = stockActuel.Quantite - quantite;
+    if(nouvelleQuantite < 0) throw new Error("stock insuffisant");
+    await updateStock(ID_boutique, ID_produit, nouvelleQuantite);
+    return nouvelleQuantite;
+};
+
+// incrementation du stock (remise lors d'une suppression de detail)
+const increment_stock = async(ID_produit, ID_boutique, quantite) => {
+    const stockActuel = await getStockByProductAndBoutique(ID_produit, ID_boutique);
+    if(!stockActuel) throw new Error("produit non trouvé en stock");
+    const nouvelleQuantite = stockActuel.Quantite + quantite;
+    await updateStock(ID_boutique, ID_produit, nouvelleQuantite);
+    return nouvelleQuantite;
+};
 //expoter les fonctions
 module.exports = 
 {
@@ -88,5 +106,7 @@ module.exports =
     getStockByProductID,
     getStockByBoutique,
     getStockByBoutique1,
-    getStockByProductAndBoutique
+    getStockByProductAndBoutique,
+    decrement_stock,
+    increment_stock
 };

@@ -12,6 +12,10 @@ const boutiqueRoutes = require('./routes/boutique');
 const categorieRoutes = require('./routes/categorie');
 const produitRoutes = require('./routes/produit');
 const stockRoutes = require('./routes/stock');
+const employeRoutes = require('./routes/employe');
+const managerRoutes= require('./routes/manager');
+const commandeRoutes= require('./routes/commande');
+const detailRoutes = require('./routes/details_commande');
 
 // Middleware
 app.use(cors());
@@ -33,6 +37,10 @@ app.use("/api/boutiques", boutiqueRoutes);
 app.use("/api/categories", categorieRoutes);
 app.use("/api/produits", produitRoutes);
 app.use("/api/stocks", stockRoutes);
+app.use("/api/employes", employeRoutes);
+app.use("/api/managers", managerRoutes);
+app.use("/api/commandes", commandeRoutes);
+app.use('/api/details', detailRoutes);
 
 // Test connexion à la base au démarrage
 db.getConnection()

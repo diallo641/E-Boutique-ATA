@@ -98,7 +98,15 @@ exports.updateCompte = async (req, res) => {
             return res.status(404).json({ message: "Compte non trouvé" });
         }
 
-        // Vérifier rôle si fourni
+        // 🔹 Vérifier email unique si modifié
+        if (Email) {
+            const emailExiste = await CompteModel.getCompteByEmail(Email);
+            if (emailExiste && emailExiste.ID_compte !== id) {
+                return res.status(409).json({ message: "Email déjà utilisé" });
+            }
+        }
+
+        // 🔹 Vérifier rôle si fourni
         if (ID_role) {
             const roleExistant = await RoleModel.getRoleById(ID_role);
             if (!roleExistant) {
@@ -106,13 +114,13 @@ exports.updateCompte = async (req, res) => {
             }
         }
 
-        // Hash uniquement si mot de passe fourni
+        // 🔹 Hash uniquement si mot de passe fourni
         let passwordHash = compteExistant.Mot_de_passe;
         if (Mot_de_passe) {
             passwordHash = await bcrypt.hash(Mot_de_passe, 10);
         }
 
-        const compteMaj = await CompteModel.updateCompte(
+        const comptemodifier = await CompteModel.updateCompte(
             id,
             Email || compteExistant.Email,
             passwordHash,
@@ -121,7 +129,7 @@ exports.updateCompte = async (req, res) => {
 
         res.status(200).json({
             message: "Compte mis à jour",
-            compte: compteMaj
+            compte: comptemodifier
         });
 
     } catch (error) {
