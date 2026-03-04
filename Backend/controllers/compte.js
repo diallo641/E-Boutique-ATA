@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const RoleModel = require('../models/role');
 
 
+
 // Ajouter un compte
 exports.createCompte = async (req, res) => {
     try {
@@ -12,20 +13,32 @@ exports.createCompte = async (req, res) => {
             return res.status(400).json({ message: "Tous les champs sont requis" });
         }
 
-        // Vérifier email
         const emailExistant = await CompteModel.getCompteByEmail(Email);
         if (emailExistant) {
             return res.status(409).json({ message: "Email déjà utilisé" });
         }
 
-        // Vérifier rôle
         const roleExistant = await RoleModel.getRoleById(ID_role);
         if (!roleExistant) {
             return res.status(404).json({ message: "Rôle inexistant" });
         }
 
+        // 🔐 REGLE METIER CREATE
+        if (req.user.Nom_role === "Manager") {
+            if (roleExistant.Nom_role !== "Employe") {
+                return res.status(403).json({
+                    message: "Un Manager peut seulement créer un Employé"
+                });
+            }
+        }
+
         const passwordHash = await bcrypt.hash(Mot_de_passe, 10);
-        const compte = await CompteModel.createCompte(Email, passwordHash, ID_role);
+
+        const compte = await CompteModel.createCompte(
+            Email,
+            passwordHash,
+            ID_role
+        );
 
         res.status(201).json({
             message: "Compte créé avec succès",
@@ -38,7 +51,8 @@ exports.createCompte = async (req, res) => {
 };
 
 
-// Tous les comptes (avec nom du rôle)
+
+// Tous les comptes
 exports.getAllComptes = async (req, res) => {
     try {
         const comptes = await CompteModel.getAllComptes();
@@ -58,9 +72,9 @@ exports.getAllComptes = async (req, res) => {
     }
 };
 
-// =====================
+
+
 // Un compte par ID
-// =====================
 exports.getCompteByID = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -81,9 +95,9 @@ exports.getCompteByID = async (req, res) => {
     }
 };
 
-// =====================
+
+
 // Modifier un compte
-// =====================
 exports.updateCompte = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -98,7 +112,16 @@ exports.updateCompte = async (req, res) => {
             return res.status(404).json({ message: "Compte non trouvé" });
         }
 
-        // 🔹 Vérifier email unique si modifié
+        // REGLE METIER UPDATE
+        if (req.user.Nom_role === "Manager") {
+            if (compteExistant.Nom_role !== "Employe") {
+                return res.status(403).json({
+                    message: "Un Manager peut seulement modifier un Employé"
+                });
+            }
+        }
+
+        // Vérifier email unique si modifié
         if (Email) {
             const emailExiste = await CompteModel.getCompteByEmail(Email);
             if (emailExiste && emailExiste.ID_compte !== id) {
@@ -106,15 +129,21 @@ exports.updateCompte = async (req, res) => {
             }
         }
 
-        // 🔹 Vérifier rôle si fourni
+        // Vérifier rôle si fourni
         if (ID_role) {
             const roleExistant = await RoleModel.getRoleById(ID_role);
             if (!roleExistant) {
                 return res.status(404).json({ message: "Rôle inexistant" });
             }
+
+            // Manager ne peut pas promouvoir
+            if (req.user.Nom_role === "Manager" && roleExistant.Nom_role !== "Employe") {
+                return res.status(403).json({
+                    message: "Un Manager ne peut pas modifier le rôle vers Admin ou Manager"
+                });
+            }
         }
 
-        // 🔹 Hash uniquement si mot de passe fourni
         let passwordHash = compteExistant.Mot_de_passe;
         if (Mot_de_passe) {
             passwordHash = await bcrypt.hash(Mot_de_passe, 10);
@@ -137,9 +166,9 @@ exports.updateCompte = async (req, res) => {
     }
 };
 
-// =====================
+
+
 // Supprimer un compte
-// =====================
 exports.deleteCompte = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -148,10 +177,21 @@ exports.deleteCompte = async (req, res) => {
             return res.status(400).json({ message: "ID invalide" });
         }
 
-        const deleted = await CompteModel.deleteCompte(id);
-        if (!deleted) {
+        const compte = await CompteModel.getCompteByID(id);
+        if (!compte) {
             return res.status(404).json({ message: "Compte non trouvé" });
         }
+
+        // 🔐 REGLE METIER DELETE
+        if (req.user.Nom_role === "Manager") {
+            if (compte.Nom_role !== "Employe") {
+                return res.status(403).json({
+                    message: "Un Manager peut seulement supprimer un Employé"
+                });
+            }
+        }
+
+        await CompteModel.deleteCompte(id);
 
         res.status(200).json({ message: "Compte supprimé" });
 

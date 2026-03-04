@@ -6,46 +6,82 @@ const createClient = async (Nom, Adresse, Telephone, ID_compte) => {
         "INSERT INTO client (Nom, Adresse, Telephone, ID_compte) VALUES (?, ?, ?, ?)", 
         [Nom, Adresse, Telephone, ID_compte]
     );
-    return { ID_client: result.insertId, 
-             Nom, Adresse, Telephone, ID_compte };
+
+    return { 
+        ID_client: result.insertId,
+        Nom, 
+        Adresse, 
+        Telephone, 
+        ID_compte 
+    };
 };
 
-//Tous les clients
+
+//Tous les clients (réservé admin)
 const getAllClients = async () => {
-    const [rows] = await db.query("SELECT * FROM client");
+    const [rows] = await db.query(`
+        SELECT c.ID_client, c.Nom, c.Adresse, c.Telephone, cp.Email
+        FROM client c
+        JOIN compte cp ON c.ID_compte = cp.ID_compte
+    `);
     return rows;
 };
 
-//un client 
+
+//Un client par ID_client
 const getClientByID = async (id) => {
-    const [rows] = await db.query("SELECT * FROM client WHERE ID_client = ?", [id]);
+    const [rows] = await db.query(
+        `SELECT c.ID_client, c.Nom, c.Adresse, c.Telephone, cp.Email
+         FROM client c
+         JOIN compte cp ON c.ID_compte = cp.ID_compte
+         WHERE c.ID_client = ?`,
+        [id]
+    );
     return rows[0];
 };
 
-//editer un client
-const updateClient = async (id, Nom, Adresse, Telephone, ID_compte) => {
-    await db.query(
-        "UPDATE client SET Nom = ?, Adresse = ?, Telephone = ?, ID_compte = ? WHERE ID_client = ?", 
-        [Nom, Adresse, Telephone, ID_compte, id]
+
+//Profil du client connecté (via ID_compte)
+const getClientProfile = async (ID_compte) => {
+    const [rows] = await db.query(
+        `SELECT c.ID_client, c.Nom, c.Adresse, c.Telephone, cp.Email
+         FROM client c
+         JOIN compte cp ON c.ID_compte = cp.ID_compte
+         WHERE c.ID_compte = ?`,
+        [ID_compte]
     );
-    return { ID_client: id, Nom, Adresse, Telephone, ID_compte };
+    return rows[0];
 };
 
-// Supprimer un client
+
+//Modifier profil (sans toucher ID_compte)
+const updateClientProfile = async (ID_compte, Nom, Adresse, Telephone) => {
+    await db.query(
+        `UPDATE client 
+         SET Nom = ?, Adresse = ?, Telephone = ?
+         WHERE ID_compte = ?`,
+        [Nom, Adresse, Telephone, ID_compte]
+    );
+
+    return { Nom, Adresse, Telephone };
+};
+
+
+//Supprimer un client
 const deleteClient = async (id) => {
     const client = await getClientByID(id);
     if (!client) return null;
+
     await db.query("DELETE FROM client WHERE ID_client = ?", [id]);
-    return { message: "Client supprimé avec succès", ID_client: id };
+
+    return { 
+        message: "Client supprimé avec succès", 
+        ID_client: id 
+    };
 };
 
-// Vérifier si un client existe via l'ID_compte
-const getClientByCompteID = async (ID_compte) => {
-    const [rows] = await db.query("SELECT * FROM client WHERE ID_compte = ?", [ID_compte]);
-    return rows[0];
-};
 
-//Pour avoir un numero de telephone unique
+//Vérifier téléphone unique
 const getClientByTelephone = async (telephone) => {
     const [rows] = await db.query(
         `SELECT * FROM client WHERE Telephone = ?`,
@@ -54,13 +90,14 @@ const getClientByTelephone = async (telephone) => {
     return rows[0];
 };
 
-// Exporter les fonctions
+
+// Export
 module.exports = {
     createClient,
     getAllClients,
     getClientByID,
-    updateClient,
+    getClientProfile,
+    updateClientProfile,
     deleteClient,
-    getClientByCompteID,
-    getClientByTelephone 
-};
+    getClientByTelephone
+}

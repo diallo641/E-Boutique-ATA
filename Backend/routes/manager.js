@@ -1,17 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const managerController = require('../controllers/manager');
+const authentification = require('../middlewares/authentification');
+const checkrole = require('../middlewares/checkrole');
+authentification, checkrole(['Admin']),
 //Creer un manager 
-router.post('/ajoutermanager', managerController.createManager);
+router.post('/ajoutermanager', authentification, checkrole(['Admin']), managerController.createManager);
 //La liste des managers
-router.get('/getAllManagers', managerController.getAllManagers);
+router.get('/getAllManagers', authentification, checkrole(['Admin', 'Manager']), managerController.getAllManagers);
 //Un manager 
-router.get('/getManagerByID/:id', managerController.getManagerByID);
+router.get('/getManagerByID/:id', authentification, checkrole(['Admin', 'Manager']), managerController.getManagerByID);
 //Modifier un manager
-router.put('/updateManager/:id', managerController.updatemanager);
+router.put('/updateManager/:id', authentification, checkrole(['Admin', 'Manager']),  authentification, checkrole(['Admin']), managerController.updatemanager);
 //Supprimer un manager
-router.delete('/deleteManager/:id', managerController.deleteManager);
+router.delete('/deleteManager/:id', authentification, checkrole(['Admin']), managerController.deleteManager);
 //Les employes du manager
-router.get('/getEmployesByManager/:id', managerController.getEmployesByManager);
+router.get('/getEmployesByManager/:id', authentification, checkrole(['Admin', 'Manager']), managerController.getEmployesByManager);
 
 module.exports=router;
