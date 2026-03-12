@@ -10,7 +10,8 @@ function Contact() {
       <section className="bg-blue-200 py-20 text-center">
         <h1 className="text-4xl font-bold mb-4">Contactez-nous</h1>
         <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-          Vous avez une question ou besoin d’assistance ? Envoyez-nous un message et notre équipe vous répondra rapidement.
+          Vous avez une question ou besoin d’assistance ? 
+          Envoyez-nous un message et notre équipe vous répondra rapidement.
         </p>
       </section>
 
@@ -74,7 +75,7 @@ function Contact() {
       </section>
 
       {/* Carte Google Map */}
-      <section className="py-16 px-6 max-w-5xl mx-auto">
+      <section className="py-16 px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold mb-6 text-center">Notre localisation</h2>
         <div className="w-full h-96 rounded overflow-hidden shadow">
           <iframe
