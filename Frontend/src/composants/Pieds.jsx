@@ -57,7 +57,7 @@ function Footer() {
         <div>
           <h3 className="text-lg font-bold mb-4">Contact</h3>
           <p className="text-gray-400">Email : contact@boutique.com</p>
-          <p className="text-gray-400">Téléphone : +221 77 000 00 00</p>
+          <p className="text-gray-400">Téléphone : +221 77 123 45 67</p>
 
           <div className="flex space-x-4 mt-4">
             <a href="https://facebook.com" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white">
