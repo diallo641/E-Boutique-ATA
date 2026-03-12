@@ -1,4 +1,6 @@
 import Headers from "../../composants/Headers";
+import Footer from "../../composants/Pieds";
+import AjouterAuPanier from "../../composants/AjouterPanier";
 import { Link } from "react-router-dom";
 
 function Home() {
@@ -30,7 +32,7 @@ function Home() {
             <img src="https://images.pexels.com/photos/8318201/pexels-photo-8318201.jpeg" alt="Produit 1" className="w-full h-48 object-cover mb-4" />
             <h3 className="font-bold text-lg mb-2">Produit 1</h3>
             <p className="text-gray-600 mb-2">Description courte du produit.</p>
-            <p className="font-bold">25 000 CFA</p>
+            <p className="font-bold">25 000 CFA <AjouterAuPanier /> </p>
           </div>
 
           <div className="border rounded shadow p-4 hover:shadow-lg transition">
@@ -68,7 +70,10 @@ function Home() {
           <div className="bg-white rounded shadow p-4 text-center hover:shadow-lg transition">Catégorie 4</div>
         </div>
       </section>
+      {/* Footer */}
+    <Footer />
     </div>
+    
   );
 }
 
