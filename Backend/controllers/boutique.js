@@ -46,13 +46,16 @@ const getAllBoutiques = async (req, res) =>
     try
     {
         const boutiques = await boutiqueModel.getAllBoutiques();
+         console.log("Boutiques :", boutiques);
         if(boutiques.length ==0)
         {
-            return res.status(404).json({message: "Aucune boutique trouvée"});
+            return res.status(200).json({message: "Aucune boutique trouvée"});
         }
         else
         {
-            return res.status(200).json({message : "Voici les boutiques", boutiques: boutiques, total: boutiques.length});
+            return res.status(200).json({message : "Voici les boutiques",
+                                         boutiques: boutiques,
+                                         total: boutiques.length});
         }
 
     }

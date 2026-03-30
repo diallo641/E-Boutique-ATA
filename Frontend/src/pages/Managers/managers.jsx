@@ -1,21 +1,21 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { deconnexion } from "../JS/deconnexion";
-import { getDashboardStats } from "../JS/statisques";
+import { getDashboardStats } from "../JS/statistiqueManager";
 
 function DashboardAdmin() {
 
   const [stats, setStats] = useState({
     totalClients: 0,
-    totalComptes: 0,
-    totalManagers: 0,
     totalEmployes: 0,
     totalCommandes: 0,
-    Nombreboutiques: 0,
+    totalBoutiques: 0,
+    totalCategories: 0,
+    totalProduits: 0,
     clients: []
   });
 
-  // 🔹 Charger les données au démarrage
+  //Charger les données au démarrage
   useEffect(() => {
     const fetchStats = async () => {
       const data = await getDashboardStats();
@@ -29,12 +29,13 @@ function DashboardAdmin() {
 
   //Construire les cartes statistiques
   const statsCards = [
-    { title: "Clients", value: stats.totalClients },
-    { title: "Comptes", value: stats.totalComptes },
-    { title: "Managers", value: stats.totalManagers },
     { title: "Employés", value: stats.totalEmployes },
+    { title: "Clients", value: stats.totalClients },
+    { title: "Boutiques", value: stats.totalBoutiques },
     { title: "Commandes", value: stats.totalCommandes },
-    { title: "Boutiques", value: stats.totalBoutiques }
+    { title: "Categories", value: stats.totalCategories },
+    { title: "Produits", value: stats.totalProduits }
+    
   ];
 
   //Prendre les 5 derniers clients
@@ -45,17 +46,16 @@ function DashboardAdmin() {
       
       {/* Header */}
       <header className="bg-white shadow p-4 flex flex-col md:flex-row md:justify-between md:items-center">
-        <h1 className="text-xl font-bold mb-4 md:mb-0">Dashboard Admin</h1>
+        <h1 className="text-xl font-bold mb-4 md:mb-0">Dashboard Manager</h1>
        
         <nav className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
-          <Link to="/Manager" className="text-blue-500 hover:underline">Manager</Link>
           <Link to="/employes" className="text-blue-500 hover:underline">Employes</Link>
           <Link to="/clients" className="text-blue-500 hover:underline">Clients</Link>
-          <Link to="/comptes" className="text-blue-500 hover:underline">Comptes</Link>
+          <Link to="/clients" className="text-blue-500 hover:underline">Boutiques</Link>
+          <Link to="/commandes" className="text-blue-500 hover:underline">Commandes</Link>
           <Link to="/categories" className="text-blue-500 hover:underline">Categories</Link>
           <Link to="/produits" className="text-blue-500 hover:underline">Produits</Link>
-          <Link to="/commandes" className="text-blue-500 hover:underline">Commandes</Link>
-          <Link to="/details" className="text-blue-500 hover:underline">Details</Link>
+          
 
           {/* Bouton déconnexion */}
           <button
@@ -80,7 +80,6 @@ function DashboardAdmin() {
       {/* Tableau clients récents */}
       <section className="p-6">
         <h2 className="text-xl font-bold mb-4">Clients récents</h2>
-
         <div className="overflow-x-auto bg-white rounded shadow">
           <table className="min-w-full table-auto">
             <thead className="bg-gray-200">

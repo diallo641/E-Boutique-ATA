@@ -31,4 +31,6 @@ router.get('/profil', authentification, checkrole(['Client']), clientController.
 // Modifier son profil
 router.put('/editerprofil',  authentification, checkrole(['Client']), clientController.updateProfile);
 
+
+
 module.exports = router;

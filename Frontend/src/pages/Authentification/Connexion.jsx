@@ -1,12 +1,10 @@
 import Headers from "../../composants/Headers";
 import { Link } from "react-router-dom";
+import { ConnexionForm } from "../JS/connexion";
 
 function Connexion() {
   return (
     <div>
-
-      {/* Header */}
-      
 
       {/* Section connexion */}
       <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -19,7 +17,11 @@ function Connexion() {
           </h2>
 
           {/* formulaire */}
-          <form className="space-y-4">
+          <form
+            id="ConnexionForm"
+            className="space-y-4"
+            onSubmit={ConnexionForm}
+          >
 
             {/* email */}
             <div>
@@ -28,6 +30,7 @@ function Connexion() {
               </label>
 
               <input
+                id="email"
                 type="email"
                 placeholder="Votre email"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -41,6 +44,7 @@ function Connexion() {
               </label>
 
               <input
+                id="motdepasse"
                 type="password"
                 placeholder="Votre mot de passe"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -56,6 +60,9 @@ function Connexion() {
             </button>
 
           </form>
+
+          {/* message dynamique */}
+          <div id="message" className="mt-3 text-center"></div>
 
           {/* mot de passe oublié */}
           <div className="text-right mt-2">

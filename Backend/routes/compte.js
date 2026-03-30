@@ -14,5 +14,8 @@ router.put("/editercompte/:id", authentification, checkrole(['Admin']), compteCo
 //Supprimer un compte 
 router.delete("/deletecompte/:id", authentification, checkrole(['Admin']), compteController.deleteCompte);
 
+// Route publique pour réinitialisation mot de passe
+router.post('/reinitialiser', compteController.reinitialiserMotDePasse);
+
 
 module.exports= router;

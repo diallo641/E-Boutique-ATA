@@ -7,6 +7,9 @@ import Connexion from "./pages/Authentification/Connexion";
 import Inscription from "./pages/Authentification/Inscription";
 import Reinitialiser_password from "./pages/Authentification/Reinitialiser_password";
 import Panier from "./pages/Accueil/Panier";
+import DashboardAdmin from "./pages/Admin/DashboardAdmin";
+import Managers from "./pages/Managers/managers";
+
 
 function App() {
   return (
@@ -20,6 +23,8 @@ function App() {
         <Route path="/Inscription" element={<Inscription />} />
         <Route path="/Reinitialiser_password" element={<Reinitialiser_password />} />
         <Route path="/Panier" element={<Panier />} />
+        <Route path="/Dashboardadmin" element={<DashboardAdmin />} />
+        <Route path="/Manager" element={<Managers />} />
       </Routes>
     </Router>
   );

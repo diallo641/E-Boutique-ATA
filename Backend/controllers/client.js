@@ -5,7 +5,7 @@ const roleModel = require('../models/role');
 const managerModel = require('../models/manager');
 const employeModel = require('../models/employe');
 
-// 🔹 Inscription client (frontend)
+//Inscription client (frontend)
 const inscription = async (req, res) => {
     try {
         const { Nom, Adresse, Telephone, Email, Mot_de_passe, Confirm_Mot_de_passe } = req.body;
@@ -45,7 +45,7 @@ const inscription = async (req, res) => {
     }
 };
 
-// 🔹 CRUD classique pour Admin / Manager / Employé
+//CRUD classique pour Admin / Manager / Employé
 const createclient = async (req, res) => {
     try {
         const { Nom, Adresse, Telephone, Email, Mot_de_passe, ID_role, ID_boutique } = req.body;
@@ -81,7 +81,7 @@ const createclient = async (req, res) => {
     }
 };
 
-// 🔹 Récupérer tous les clients
+//Récupérer tous les clients
 const getAllClients = async (req, res) => {
     try {
         let clients = await clientModel.getAllClients();
@@ -99,7 +99,7 @@ const getAllClients = async (req, res) => {
     }
 };
 
-// 🔹 Récupérer un client par ID
+//Récupérer un client par ID
 const getClientByID = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -119,7 +119,7 @@ const getClientByID = async (req, res) => {
     }
 };
 
-// 🔹 Modifier un client (Admin)
+//Modifier un client (Admin)
 const updateClient = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -226,7 +226,7 @@ const update = async (req, res) => {
     }
 };
 
-// 🔹 Supprimer un client
+//Supprimer un client
 const deleteClient = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -247,7 +247,7 @@ const deleteClient = async (req, res) => {
     }
 };
 
-// 🔹 Voir le profil du client connecté
+//Voir le profil du client connecté
 const getProfile = async (req, res) => {
     try {
         console.log("req.user :", req.user); 
@@ -324,8 +324,13 @@ const updateProfile = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+
+
+
+
 module.exports = { updateProfile };
-// 🔹 Export de toutes les fonctions
+//Export de toutes les fonctions
 module.exports = {
     inscription,
     createclient,
@@ -335,5 +340,6 @@ module.exports = {
     update,
     deleteClient,
     getProfile,
-    updateProfile
+    updateProfile,
+   
 }

@@ -3,6 +3,39 @@ const bcrypt = require('bcrypt');
 const RoleModel = require('../models/role');
 
 
+//Réinitialiser mot de passe
+exports.reinitialiserMotDePasse = async (req, res) => {
+    try {
+        const { Email, Nouveau_mot_de_passe } = req.body;
+
+        if (!Email || !Nouveau_mot_de_passe) {
+            return res.status(400).json({ message: "Tous les champs sont obligatoires" });
+        }
+
+        // Vérifier si le compte existe
+        const compte = await CompteModel.getCompteByEmail(Email);
+        if (!compte) return res.status(404).json({ message: "Compte introuvable" });
+
+        // Hasher le nouveau mot de passe
+        const hash = await bcrypt.hash(Nouveau_mot_de_passe, 10);
+
+        // Mettre à jour le mot de passe
+        await CompteModel.updateCompte(
+            compte.ID_compte,
+            compte.Email,
+            hash,
+            compte.ID_role
+        );
+
+        return res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
 
 // Ajouter un compte
 exports.createCompte = async (req, res) => {

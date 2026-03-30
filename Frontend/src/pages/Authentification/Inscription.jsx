@@ -1,9 +1,10 @@
-import Headers from "../../composants/Headers";
+import { InscriptionForm } from "../JS/inscription";
 import { Link } from "react-router-dom";
 
 function Inscription() {
   return (
     <div>
+
       {/* Section inscription */}
       <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
 
@@ -25,6 +26,8 @@ function Inscription() {
 
               <input
                 type="text"
+                id="nom"
+                name="nom"
                 placeholder="Votre nom"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -38,6 +41,8 @@ function Inscription() {
 
               <input
                 type="text"
+                id="adresse"
+                name="adresse"
                 placeholder="Votre adresse"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -51,6 +56,8 @@ function Inscription() {
 
               <input
                 type="text"
+                id="telephone"
+                name="telephone"
                 placeholder="Votre numéro"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -64,6 +71,8 @@ function Inscription() {
 
               <input
                 type="email"
+                id="email"
+                name="email"
                 placeholder="Votre email"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -77,6 +86,8 @@ function Inscription() {
 
               <input
                 type="password"
+                id="motdepasse"
+                name="motdepasse"
                 placeholder="Votre mot de passe"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -90,6 +101,8 @@ function Inscription() {
 
               <input
                 type="password"
+                id="confirmMotdepasse"
+                name="confirmMotdepasse"
                 placeholder="Confirmer le mot de passe"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -98,7 +111,8 @@ function Inscription() {
             {/* bouton */}
             <div className="md:col-span-2">
               <button
-                type="submit"
+                type="button"
+                onClick={InscriptionForm}
                 className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
               >
                 S'inscrire
@@ -106,6 +120,9 @@ function Inscription() {
             </div>
 
           </form>
+
+          {/* message */}
+          <div id="message" className="mt-4 text-center"></div>
 
           {/* lien connexion */}
           <p className="text-center mt-6 text-sm text-gray-600">
