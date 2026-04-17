@@ -57,21 +57,24 @@ const createEmploye = async (req, res) => {
 };
 
 
-//Lister tous les employés
-
+// Lister tous les employés
 const getAllEmployes = async (req, res) => {
     try {
         let employes;
 
         if (req.user.Nom_role === "Manager") {
-            // Les managers ne voient que leurs employés
-            employes = await employeModel.getEmployesByManagerID(req.user.ID_compte);
+            // Récupérer l'ID_manager correspondant au compte connecté
+            const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
+            if (!manager) {
+                return res.status(404).json({ message: "Manager introuvable" });
+            }
+
+            // Récupérer les employés rattachés à ce manager
+            employes = await employeModel.getEmployesByManagerID(manager.ID_manager);
         } else {
             // Admin voit tous les employés
             employes = await employeModel.getAllEmployes();
         }
-
-        if (employes.length === 0) return res.status(404).json({ message: "Aucun employé trouvé" });
 
         return res.status(200).json({
             message: "Employés récupérés avec succès",
@@ -80,9 +83,12 @@ const getAllEmployes = async (req, res) => {
         });
 
     } catch (error) {
+        console.error("Erreur getAllEmployes :", error);
         return res.status(500).json({ message: error.message });
     }
 };
+
+
 
 
 //Employés par boutique

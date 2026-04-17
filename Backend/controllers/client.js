@@ -84,21 +84,39 @@ const createclient = async (req, res) => {
 //Récupérer tous les clients
 const getAllClients = async (req, res) => {
     try {
-        let clients = await clientModel.getAllClients();
+        let clients;
 
-        if (req.user.Nom_role === "Manager" || req.user.Nom_role === "Employe") {
-            clients = clients.filter(c => c.ID_boutique === req.user.ID_boutique);
+        // 🔥 MANAGER
+        if (req.user.Nom_role === "Manager") {
+            const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
+            if (!manager) {
+                return res.status(404).json({ message: "Manager introuvable" });
+            }
+
+            clients = await clientModel.getClientsByBoutiqueID(manager.ID_boutique);
         }
 
-        if (clients.length === 0) return res.status(404).json({ message: "Aucun client trouvé" });
+        // 🔥 EMPLOYE
+        else if (req.user.Nom_role === "Employe") {
+            clients = await clientModel.getClientsByBoutiqueID(req.user.ID_boutique);
+        }
 
-        return res.status(200).json({ clients, total: clients.length });
+        // 🔥 ADMIN
+        else {
+            clients = await clientModel.getAllClients();
+        }
+
+        return res.status(200).json({
+            message: "Clients récupérés",
+            total: clients.length,
+            clients
+        });
 
     } catch (error) {
+        console.error("Erreur getAllClients :", error);
         return res.status(500).json({ message: error.message });
     }
 };
-
 //Récupérer un client par ID
 const getClientByID = async (req, res) => {
     try {

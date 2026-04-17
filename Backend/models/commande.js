@@ -1,16 +1,17 @@
-const db= require('../config/db');
+const db = require('../config/db');
 
-
-const createCommande = async({ Total, Statut_commande='En cours', Mode_paiement, ID_client, ID_employe, ID_boutique }) =>
-{
+// -------------------
+// Créer une commande
+// -------------------
+const createCommande = async ({ Total, Statut_commande = 'En cours', Mode_paiement, ID_client, ID_employe, ID_boutique }) => {
     const [result] = await db.query(
-        "insert into commande (Total, Statut_commande, Mode_paiement, Date_commande, Date_modification, ID_client, ID_employe, ID_boutique) values(?, ?, ?, NOW(), NOW(), ?, ?, ?)",
+        "INSERT INTO commande (Total, Statut_commande, Mode_paiement, Date_commande, Date_modification, ID_client, ID_employe, ID_boutique) VALUES (?, ?, ?, NOW(), NOW(), ?, ?, ?)",
         [Total, Statut_commande, Mode_paiement, ID_client, ID_employe, ID_boutique]
     );
 
-    const ID_commande = result.insertId; // 🔥 récupérer l'ID généré
+    const ID_commande = result.insertId;
 
-    // Générer automatiquement Reference_commande
+    // 🔥 Génération référence
     const annee = new Date().getFullYear();
     const Reference_commande = `CMD-${annee}-${String(ID_commande).padStart(5, '0')}`;
 
@@ -30,67 +31,104 @@ const createCommande = async({ Total, Statut_commande='En cours', Mode_paiement,
         ID_boutique,
         ID_employe,
         ID_client
-    }
+    };
 };
 
-//Avoir toutes les commandes pour adminstrateur
-const getAllCommandes = async() =>
-{
-    const [rows] = await db.query("select * from commande");
-    return rows
+// -------------------
+// ADMIN
+// -------------------
+const getAllCommandes = async () => {
+    const [rows] = await db.query("SELECT * FROM commande");
+    return rows;
 };
 
-//Avoir une seule commande
-const getCommandeByID = async(id) =>
-{
-    const [rows] = await db.query("select * from commande where ID_commande=?", [id]);
+// -------------------
+// PAR ID
+// -------------------
+const getCommandeByID = async (id) => {
+    const [rows] = await db.query(
+        "SELECT * FROM commande WHERE ID_commande = ?",
+        [id]
+    );
     return rows[0];
-}
-//Avoir les commandes d'un clients
-const getCommandesClient = async(id) =>
-{
-    const [rows] = await db.query("select * from commande where ID_client=?", [id]);
-    return rows;
 };
-//Avoir les commandes d'une boutique
-const getCommandeByBoutique = async(id) =>
-{
-    const [rows] = await db.query("select * from commande where ID_boutique=?", [id]);
-    return rows;
-}
-//Avoir les commandes gerés par un employé
-const getCommandeByEmploye = async(id) =>
-{
-    const [rows] = await db.query("select * from commande where ID_employe=?", [id]);
+
+// -------------------
+// CLIENT
+// -------------------
+const getCommandesByClientID = async (ID_client) => {
+    const [rows] = await db.query(
+        "SELECT * FROM commande WHERE ID_client = ?",
+        [ID_client]
+    );
     return rows;
 };
 
-//editer une commande
-const updateCommande = async(id, { Total, Statut_commande, Mode_paiement, ID_client, ID_employe, ID_boutique }) =>
-{
-    const [result] = await db.query("update commande set Total=?, Statut_commande=?, Mode_paiement=?, Date_modification=NOW(), ID_client=?, ID_employe=?, ID_boutique=? where ID_commande= ?", 
+// -------------------
+// BOUTIQUE (Manager / Employé)
+// -------------------
+const getCommandesByBoutiqueID = async (ID_boutique) => {
+    const [rows] = await db.query(
+        "SELECT * FROM commande WHERE ID_boutique = ?",
+        [ID_boutique]
+    );
+    return rows;
+};
+
+// -------------------
+// EMPLOYÉ
+// -------------------
+const getCommandesByEmployeID = async (ID_employe) => {
+    const [rows] = await db.query(
+        "SELECT * FROM commande WHERE ID_employe = ?",
+        [ID_employe]
+    );
+    return rows;
+};
+
+// -------------------
+// UPDATE
+// -------------------
+const updateCommande = async ({ id, Total, Statut_commande, Mode_paiement, ID_client, ID_employe, ID_boutique }) => {
+    await db.query(
+        "UPDATE commande SET Total=?, Statut_commande=?, Mode_paiement=?, Date_modification=NOW(), ID_client=?, ID_employe=?, ID_boutique=? WHERE ID_commande=?",
         [Total, Statut_commande, Mode_paiement, ID_client, ID_employe, ID_boutique, id]
     );
-    return{ID_commande:id, Total, Statut_commande, Mode_paiement, ID_client, ID_employe, ID_boutique}; 
-    
+
+    return {
+        ID_commande: id,
+        Total,
+        Statut_commande,
+        Mode_paiement,
+        ID_client,
+        ID_employe,
+        ID_boutique
+    };
 };
 
-//Supprimer une commande
-const deleteCommande = async(id) =>
-{
-    await db.query("delete from commande where ID_commande=?", [id]);
-    return {message: "Commande supprime avec succés", ID_commande: id};
+// -------------------
+// DELETE
+// -------------------
+const deleteCommande = async (id) => {
+    await db.query(
+        "DELETE FROM commande WHERE ID_commande = ?",
+        [id]
+    );
+
+    return {
+        message: "Commande supprimée avec succès",
+        ID_commande: id
+    };
 };
 
-//Exporter les fonctions
-module.exports = 
-{
+// -------------------
+module.exports = {
     createCommande,
     getAllCommandes,
-    getCommandeByBoutique,
-    getCommandeByEmploye,
     getCommandeByID,
-    getCommandesClient,
+    getCommandesByClientID,
+    getCommandesByBoutiqueID,
+    getCommandesByEmployeID,
     updateCommande,
     deleteCommande
-}
+};

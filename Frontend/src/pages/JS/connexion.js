@@ -34,21 +34,29 @@ export async function ConnexionForm(e) {
 
     // succès
     messageDiv.innerHTML =
-      '<p class="text-green-500">Connexion réussie</p>';
+      '<p class="text-green-500">Connexion réussie: ' + data.user.Nom_role + '</p>';
+      console.log("ID connexion:", data.user.ID_compte);
+      
 
     localStorage.setItem("token", data.token);
 
     const role = data.user.Nom_role;
+    console.log("ROLE FRONTEND :", role);
 
     setTimeout(() => {
       if (role === "Admin") {
+        console.log(role);
         window.location.href = "/Dashboardadmin";
       } else if (role === "Manager") {
-        window.location.href = "/manager";
-      } else {
-        window.location.href = "/Dashboardadmin";
+        console.log(role);
+        window.location.href = "/Manager";
+      } else if(role === "Employe") {
+        window.location.href = "/employes";
       }
-    }, 2000);
+       else {
+        window.location.href = "/Dashboardclient";
+      }
+    }, 3000);
 
   } catch (error) {
     console.error(error);

@@ -100,6 +100,8 @@ const getEmployeByTelephone = async (Telephone) =>
     return rows[0];
 };
 
+
+
 // Exporter les fonctions
 module.exports =
 {

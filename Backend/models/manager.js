@@ -58,6 +58,17 @@ const getEmployesByManagerID = async (id) => {
     return rows;
 };
 
+// managerModel.js
+// Récupérer un manager par ID_compte
+const getManagerByCompteID = async (ID_compte) => {
+    const [rows] = await db.execute(
+        "SELECT * FROM manager WHERE ID_compte = ?",
+        [ID_compte]
+    );
+    return rows[0]; // retourne le manager correspondant
+};
+
+
 
 // Exporter les fonctions
 module.exports = {
@@ -67,5 +78,6 @@ module.exports = {
     updateManager,
     deleteManager,
     getManagerByTelephone,
-    getEmployesByManagerID
+    getEmployesByManagerID,
+    getManagerByCompteID
 };

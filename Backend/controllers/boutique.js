@@ -1,4 +1,5 @@
 const boutiqueModel = require('../models/boutique');
+const managerModel = require('../models/manager');
 
 //Ajouter une boutique
 const ajouterBoutique = async(req, res) =>
@@ -41,30 +42,44 @@ const ajouterBoutique = async(req, res) =>
 };
 
 //Toutes les boutiques
-const getAllBoutiques = async (req, res) => 
-{
-    try
-    {
-        const boutiques = await boutiqueModel.getAllBoutiques();
-         console.log("Boutiques :", boutiques);
-        if(boutiques.length ==0)
-        {
-            return res.status(200).json({message: "Aucune boutique trouvée"});
-        }
-        else
-        {
-            return res.status(200).json({message : "Voici les boutiques",
-                                         boutiques: boutiques,
-                                         total: boutiques.length});
+const getAllBoutiques = async (req, res) => {
+    try {
+        let boutiques;
+
+        // 🔥 MANAGER
+        if (req.user.Nom_role === "Manager") {
+            const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
+            if (!manager) {
+                return res.status(404).json({ message: "Manager introuvable" });
+            }
+
+            const boutique = await boutiqueModel.getBoutiqueByID(manager.ID_boutique);
+
+            boutiques = boutique ? [boutique] : [];
         }
 
-    }
-    catch(error)
-    {
+        // 🔥 EMPLOYE
+        else if (req.user.Nom_role === "Employe") {
+            const boutique = await boutiqueModel.getBoutiqueByID(req.user.ID_boutique);
+            boutiques = boutique ? [boutique] : [];
+        }
+
+        // 🔥 ADMIN
+        else {
+            boutiques = await boutiqueModel.getAllBoutiques();
+        }
+
+        return res.status(200).json({
+            message: "Boutiques récupérées",
+            total: boutiques.length,
+            boutiques
+        });
+
+    } catch (error) {
+        console.error("Erreur getAllBoutiques :", error);
         return res.status(500).json({ message: error.message });
     }
 };
-
 //Avoir une seule boutique
 const getBoutiqueById = async (req, res) =>
 {

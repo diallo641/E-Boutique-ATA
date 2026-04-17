@@ -9,12 +9,14 @@ const checkrole = (rolesautorises) =>
         else
         {
             const userrole = req.user.Nom_role;
+            console.log("USER TOKEN :", req.user);
             if(!rolesautorises.includes(userrole))
             {
                 return res.status(403).json({ message: "Accès interdit : rôle pas autorisé" });
             }
             else
             {
+                
                 next();
             }
         }

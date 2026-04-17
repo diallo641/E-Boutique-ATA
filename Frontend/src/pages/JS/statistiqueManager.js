@@ -1,3 +1,5 @@
+
+
 const BASE_URL = "http://localhost:3000/api";
 
 //Fonction générique avec token
@@ -64,9 +66,9 @@ export const getCategories = async() =>
 }
 
 //Produits
-export const getProduits = async() =>{
-    const data = await fetchData(`${BASE_URL}/produits/getAllProduits`)
-    return data?.Produits || []
+export const getStocks = async() =>{
+    const data = await fetchData(`${BASE_URL}/stocks/getAllStocks`)
+    return data?.Stocks || []
 }
 
 //STATS GLOBAL DASHBOARD
@@ -78,14 +80,14 @@ export const getDashboardStats = async () => {
             boutiques,
             commandes,
             categories,
-            produits
+            stocks
         ] = await Promise.all([
             getEmployes(),
             getClients(),
             getBoutiques(),
             getCommandes(),
             getCategories(),
-            getProduits()
+            getStocks()
             
         ]);
 
@@ -95,7 +97,7 @@ export const getDashboardStats = async () => {
             totalBoutiques: boutiques.length,
             totalCommandes: commandes.length,
             totalCategories: categories.length,
-            totalProduits: produits.length,
+            totalStocks: stocks.length,
 
             
             employes,
@@ -103,7 +105,7 @@ export const getDashboardStats = async () => {
             boutiques,
             commandes,
             categories,
-            produits
+            stocks
         };
 
     } catch (error) {
@@ -120,7 +122,7 @@ export const getDashboardStats = async () => {
             boutiques: [],
             commandes: [],
             categories: [],
-            produits: []
+            stocks: []
         };
     }
 };

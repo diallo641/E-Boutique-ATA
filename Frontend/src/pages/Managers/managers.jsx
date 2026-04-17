@@ -11,8 +11,9 @@ function DashboardAdmin() {
     totalCommandes: 0,
     totalBoutiques: 0,
     totalCategories: 0,
-    totalProduits: 0,
-    clients: []
+    totalStocks: 0,
+    boutiques: [],
+    stocks: [],
   });
 
   //Charger les données au démarrage
@@ -34,12 +35,13 @@ function DashboardAdmin() {
     { title: "Boutiques", value: stats.totalBoutiques },
     { title: "Commandes", value: stats.totalCommandes },
     { title: "Categories", value: stats.totalCategories },
-    { title: "Produits", value: stats.totalProduits }
+    { title: "Stocks", value: stats.totalStocks }
     
   ];
 
   //Prendre les 5 derniers clients
-  const recentClients = stats.clients.slice(0, 5);
+  const recentBoutiques = stats.boutiques.slice(0, 5);
+  const stocksBoutiques = stats.stocks.slice(0, 5);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -77,45 +79,36 @@ function DashboardAdmin() {
         ))}
       </section>
 
-      {/* Tableau clients récents */}
+      {/* Tableau  récents */}
       <section className="p-6">
-        <h2 className="text-xl font-bold mb-4">Clients récents</h2>
+        <h2 className="text-xl font-bold mb-4">Boutiques</h2>
         <div className="overflow-x-auto bg-white rounded shadow">
           <table className="min-w-full table-auto">
             <thead className="bg-gray-200">
               <tr>
-                <th className="px-4 py-2 text-left">Nom</th>
-                <th className="px-4 py-2 text-left">Téléphone</th>
-                <th className="px-4 py-2 text-left hidden md:table-cell">ID Compte</th>
-                <th className="px-4 py-2 text-left hidden md:table-cell">Actions</th>
+                <th className="px-4 py-2 text-left">ID</th>
+                <th className="px-4 py-2 text-left">Nom_boutique</th>
+                <th className="px-4 py-2 text-left">Email</th>
+                <th className="px-4 py-2 text-left hidden md:table-cell">Adresse</th>
+                <th className="px-4 py-2 text-left hidden md:table-cell">Télephone</th>
               </tr>
             </thead>
 
             <tbody>
-              {recentClients.length > 0 ? (
-                recentClients.map((client) => (
-                  <tr key={client.ID_client} className="border-b">
-                    <td className="px-4 py-2">{client.Nom}</td>
-                    <td className="px-4 py-2">{client.Telephone}</td>
-                    <td className="px-4 py-2 hidden md:table-cell">{client.ID_client}</td>
-
-                    <td className="px-4 py-2 space-x-2 hidden md:table-cell">
-                      <button className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600">
-                        Voir
-                      </button>
-                      <button className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-                        Modifier
-                      </button>
-                      <button className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                        Supprimer
-                      </button>
-                    </td>
+              {recentBoutiques.length > 0 ? (
+                recentBoutiques.map((boutique) => (
+                  <tr key={boutique.ID_boutique} className="border-b">
+                    <td className="px-4 py-2">{boutique.ID_boutique}</td>
+                    <td className="px-4 py-2">{boutique.Nom_boutique}</td>
+                    <td className="px-4 py-2">{boutique.Email}</td>
+                    <td className="px-4 py-2 hidden md:table-cell">{boutique.Adresse}</td>
+                    <td className="px-4 py-2 hidden md:table-cell">{boutique.Telephone}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td colSpan="4" className="text-center py-4">
-                    Aucun client trouvé
+                    Aucun 
                   </td>
                 </tr>
               )}
@@ -124,6 +117,43 @@ function DashboardAdmin() {
           </table>
         </div>
       </section>
+
+      {/* Tableau  récents */}
+      <section className="p-6">
+        <h2 className="text-xl font-bold mb-4">Produist en Stocks</h2>
+        <div className="overflow-x-auto bg-white rounded shadow">
+          <table className="min-w-full table-auto">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="px-4 py-2 text-left">ID_boutique</th>
+                <th className="px-4 py-2 text-left">ID_produit</th>
+                <th className="px-4 py-2 text-left">Quantité</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {stocksBoutiques.length > 0 ? (
+                stocksBoutiques.map((stock) => (
+                  <tr key={`${stock.ID_boutique}-${stock.ID_produit}`} className="border-b">
+                    <td className="px-4 py-2">{stock.ID_boutique}</td>
+                    <td className="px-4 py-2">{stock.ID_produit}</td>
+                    <td className="px-4 py-2">{stock.Quantite}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center py-4">
+                    Aucun 
+                  </td>
+                </tr>
+              )}
+            </tbody>
+
+          </table>
+        </div>
+      </section>
+
+      
 
       {/* Footer */}
       <footer className="bg-white shadow p-4 text-center text-gray-500">

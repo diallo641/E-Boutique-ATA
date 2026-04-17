@@ -90,6 +90,24 @@ const getClientByTelephone = async (telephone) => {
     return rows[0];
 };
 
+const getClientsByBoutiqueID = async (id_boutique) => {
+    const [rows] = await db.query(`
+        SELECT DISTINCT c.*
+        FROM client c
+        INNER JOIN commande cmd ON c.ID_client = cmd.ID_client
+        WHERE cmd.ID_boutique = ?
+    `, [id_boutique]);
+
+    return rows;
+};
+
+const getClientByCompteID = async (ID_compte) => {
+    const [rows] = await db.query(
+        "SELECT * FROM client WHERE ID_compte = ?",
+        [ID_compte]
+    );
+    return rows[0];
+};
 
 // Export
 module.exports = {
@@ -99,5 +117,7 @@ module.exports = {
     getClientProfile,
     updateClientProfile,
     deleteClient,
-    getClientByTelephone
+    getClientByTelephone,
+    getClientsByBoutiqueID,
+    getClientByCompteID
 }

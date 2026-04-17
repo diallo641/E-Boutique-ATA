@@ -9,6 +9,15 @@ import Reinitialiser_password from "./pages/Authentification/Reinitialiser_passw
 import Panier from "./pages/Accueil/Panier";
 import DashboardAdmin from "./pages/Admin/DashboardAdmin";
 import Managers from "./pages/Managers/managers";
+import Employes from "./pages/Employes/employes";
+import DashboardClient from "./pages/Clients/DashboardClient";  
+import Clients from "./pages/Clients/Clients";  
+import DashboardComptes from "./pages/Comptes/DashboardComptes";
+import CategoriesAdmin from "./pages/Categories/CategoriesAdmin";
+import ProduitsAdmin from "./pages/Produits/produitsAdmin";
+import PageProduitsClient from "./pages/Clients/ProduitsClients";
+import AjouterCommande from "./pages/Commandes/AjouterCommande"; 
+import CommandeSuccess from "./pages/Clients/commande_success";
 
 
 function App() {
@@ -16,7 +25,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/produits" element={<Produits />} />
+        
         <Route path="/apropos" element={<Apropos />} />
         <Route path="/Contact" element={<Contact />} />
         <Route path="/Connexion" element={<Connexion />} />
@@ -25,6 +34,16 @@ function App() {
         <Route path="/Panier" element={<Panier />} />
         <Route path="/Dashboardadmin" element={<DashboardAdmin />} />
         <Route path="/Manager" element={<Managers />} />
+        <Route path="/employes" element={<Employes />} />
+        <Route path="/Dashboardclient" element={<DashboardClient />} />
+        <Route path="/AjouterCommande" element={<AjouterCommande />} />
+        <Route path="/Clients" element={<Clients />} />
+        <Route path="/Comptes" element={<DashboardComptes />} />
+        <Route path="/Categories" element={<CategoriesAdmin />} />
+        <Route path="/Produits" element={<ProduitsAdmin />} />
+        <Route path="/client/produits" element={<PageProduitsClient />} />
+        <Route path="/commande_success" element={<CommandeSuccess />} />
+        
       </Routes>
     </Router>
   );

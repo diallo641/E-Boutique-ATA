@@ -22,10 +22,12 @@ const getAllComptes = async () => {
         SELECT 
             c.ID_compte,
             c.Email,
+            c.Date_creation,
+            c.Date_modification,
             r.ID_role,
             r.Nom_role
         FROM compte c
-        JOIN role r ON c.ID_role = r.ID_role
+        JOIN role r ON c.ID_role = r.ID_role order by c.ID_compte asc
     `);
     return rows;
 };
