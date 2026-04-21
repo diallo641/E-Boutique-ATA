@@ -1,33 +1,33 @@
 const jwt = require('jsonwebtoken');
-const authentification = (req, res, next) =>
-{
-    try
-    {
+
+const authentification = (req, res, next) => {
+    try {
         const header = req.headers.authorization;
-        if(!header)
-        {
+
+        if (!header) {
             return res.status(401).json({ message: "Token manquant" });
         }
-        else
-        {
-            const token = header.split(" ")[1];
-            if(!token)
-            {
-                return res.status(401).json({ message: "Token invalide" });
-            }
-            else
-            {
-                const decode = jwt.verify(token, process.env.JWT_SECRET);
-                req.user= decode;
-                next();
 
-            }
-            
+        const token = header.split(" ")[1];
+
+        if (!token) {
+            return res.status(401).json({ message: "Token invalide" });
         }
 
-    }
-    catch(error)
-    {
+        const decode = jwt.verify(token, process.env.JWT_SECRET);
+
+        // 🔥 NORMALISATION IMPORTANTE ICI
+        req.user = {
+            ID_compte: decode.ID_compte,
+            Nom_role: decode.Nom_role,
+            ID_boutique: decode.ID_boutique || null,
+            ID_employe: decode.ID_employe || null,
+            ID_client: decode.ID_client || null
+        };
+
+        next();
+
+    } catch (error) {
         return res.status(401).json({ message: "Token invalide ou expiré" });
     }
 };

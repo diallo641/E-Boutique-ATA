@@ -2,32 +2,42 @@ const stockModel = require('../models/stock');
 const managerModel = require('../models/manager');
 
 
+// -------------------
 // Créer un stock
+// -------------------
 const createStock = async (req, res) => {
     try {
         const { ID_produit, ID_boutique, Quantite } = req.body;
 
-        if (!ID_produit || !ID_boutique || !Quantite) {
+        if (!ID_produit || !ID_boutique || Quantite === undefined) {
             return res.status(400).json({ message: "Tous les champs sont requis" });
         }
 
-        // 🔒 Sécurité Manager
+        if (Quantite < 0) {
+            return res.status(400).json({ message: "Quantité invalide" });
+        }
+
+        // 🔒 Manager
         if (req.user.Nom_role === "Manager") {
             const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
 
             if (!manager || manager.ID_boutique !== ID_boutique) {
-                return res.status(403).json({ message: "Accès interdit : vous ne pouvez gérer que votre boutique" });
+                return res.status(403).json({ message: "Accès interdit" });
             }
         }
 
-        // 🔒 Sécurité Employé
+        // 🔒 Employé
         if (req.user.Nom_role === "Employe" && req.user.ID_boutique !== ID_boutique) {
             return res.status(403).json({ message: "Accès interdit" });
         }
 
         const stockExistant = await stockModel.getStockByProductAndBoutique(ID_produit, ID_boutique);
+
         if (stockExistant) {
-            return res.status(409).json({ message: "Stock déjà existant", Stock: stockExistant });
+            return res.status(409).json({
+                message: "Stock déjà existant",
+                Stock: stockExistant
+            });
         }
 
         const nouveauStock = await stockModel.createStock(ID_boutique, ID_produit, Quantite);
@@ -42,8 +52,9 @@ const createStock = async (req, res) => {
     }
 };
 
+
 // -------------------
-// Lister les stocks
+// Lister tous les stocks
 // -------------------
 const getAllStocks = async (req, res) => {
     try {
@@ -51,7 +62,10 @@ const getAllStocks = async (req, res) => {
 
         if (req.user.Nom_role === "Manager") {
             const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
-            if (!manager) return res.status(404).json({ message: "Manager introuvable" });
+
+            if (!manager) {
+                return res.status(404).json({ message: "Manager introuvable" });
+            }
 
             stocks = await stockModel.getStockByBoutique(manager.ID_boutique);
         }
@@ -65,7 +79,7 @@ const getAllStocks = async (req, res) => {
         }
 
         return res.status(200).json({
-            message: stocks.length === 0 ? "Aucun stock trouvé" : "Stocks récupérés avec succès",
+            message: stocks.length === 0 ? "Aucun stock trouvé" : "Stocks récupérés",
             total: stocks.length,
             Stocks: stocks
         });
@@ -74,6 +88,7 @@ const getAllStocks = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
 
 // -------------------
 // Stock par produit
@@ -85,7 +100,7 @@ const getStockByProductID = async (req, res) => {
         const stocks = await stockModel.getStockByProductID(ID_produit);
 
         return res.status(200).json({
-            message: stocks.length === 0 ? "Aucun stock trouvé pour ce produit" : "Stocks récupérés avec succès",
+            message: stocks.length === 0 ? "Aucun stock trouvé" : "Stocks récupérés",
             total: stocks.length,
             Stocks: stocks
         });
@@ -94,6 +109,7 @@ const getStockByProductID = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
 
 // -------------------
 // Stock par boutique
@@ -102,7 +118,6 @@ const getStockByBoutique = async (req, res) => {
     try {
         const { ID_boutique } = req.params;
 
-        // 🔒 Manager
         if (req.user.Nom_role === "Manager") {
             const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
 
@@ -111,7 +126,6 @@ const getStockByBoutique = async (req, res) => {
             }
         }
 
-        // 🔒 Employé
         if (req.user.Nom_role === "Employe" && req.user.ID_boutique != ID_boutique) {
             return res.status(403).json({ message: "Accès interdit" });
         }
@@ -119,7 +133,7 @@ const getStockByBoutique = async (req, res) => {
         const stocks = await stockModel.getStockByBoutique(ID_boutique);
 
         return res.status(200).json({
-            message: stocks.length === 0 ? "Aucun stock trouvé pour cette boutique" : "Stocks récupérés avec succès",
+            message: stocks.length === 0 ? "Aucun stock trouvé" : "Stocks récupérés",
             total: stocks.length,
             Stocks: stocks
         });
@@ -129,14 +143,14 @@ const getStockByBoutique = async (req, res) => {
     }
 };
 
+
 // -------------------
-// Stock spécifique (produit + boutique)
+// Stock produit + boutique
 // -------------------
 const getStockByProductAndBoutique = async (req, res) => {
     try {
         const { ID_produit, ID_boutique } = req.params;
 
-        // 🔒 Manager
         if (req.user.Nom_role === "Manager") {
             const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
 
@@ -145,7 +159,6 @@ const getStockByProductAndBoutique = async (req, res) => {
             }
         }
 
-        // 🔒 Employé
         if (req.user.Nom_role === "Employe" && req.user.ID_boutique != ID_boutique) {
             return res.status(403).json({ message: "Accès interdit" });
         }
@@ -166,6 +179,7 @@ const getStockByProductAndBoutique = async (req, res) => {
     }
 };
 
+
 // -------------------
 // Modifier stock
 // -------------------
@@ -174,11 +188,10 @@ const updateStock = async (req, res) => {
         const { ID_produit, ID_boutique } = req.params;
         const { Quantite } = req.body;
 
-        if (!Quantite) {
-            return res.status(400).json({ message: "La quantité est requise" });
+        if (Quantite === undefined || Quantite < 0) {
+            return res.status(400).json({ message: "Quantité invalide" });
         }
 
-        // 🔒 Manager
         if (req.user.Nom_role === "Manager") {
             const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
 
@@ -187,20 +200,24 @@ const updateStock = async (req, res) => {
             }
         }
 
-        // 🔒 Employé
         if (req.user.Nom_role === "Employe" && req.user.ID_boutique != ID_boutique) {
             return res.status(403).json({ message: "Accès interdit" });
         }
 
         const stockExistant = await stockModel.getStockByProductAndBoutique(ID_produit, ID_boutique);
+
         if (!stockExistant) {
             return res.status(404).json({ message: "Stock non trouvé" });
         }
 
-        const stockMisAJour = await stockModel.updateStock(ID_boutique, ID_produit, Quantite);
+        const stockMisAJour = await stockModel.updateStock(
+            ID_boutique,
+            ID_produit,
+            Quantite
+        );
 
         return res.status(200).json({
-            message: "Stock mis à jour avec succès",
+            message: "Stock mis à jour",
             Stock: stockMisAJour
         });
 
@@ -209,6 +226,7 @@ const updateStock = async (req, res) => {
     }
 };
 
+
 // -------------------
 // Supprimer stock
 // -------------------
@@ -216,7 +234,6 @@ const deleteStock = async (req, res) => {
     try {
         const { ID_produit, ID_boutique } = req.params;
 
-        // 🔒 Manager
         if (req.user.Nom_role === "Manager") {
             const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
 
@@ -225,12 +242,12 @@ const deleteStock = async (req, res) => {
             }
         }
 
-        // 🔒 Employé
         if (req.user.Nom_role === "Employe" && req.user.ID_boutique != ID_boutique) {
             return res.status(403).json({ message: "Accès interdit" });
         }
 
         const stockExistant = await stockModel.getStockByProductAndBoutique(ID_produit, ID_boutique);
+
         if (!stockExistant) {
             return res.status(404).json({ message: "Stock non trouvé" });
         }
@@ -245,6 +262,7 @@ const deleteStock = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
 
 // -------------------
 module.exports = {

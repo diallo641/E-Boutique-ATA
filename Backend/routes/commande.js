@@ -5,28 +5,42 @@ const commandeController = require('../controllers/commande');
 const authentification = require('../middlewares/authentification');
 const checkrole = require('../middlewares/checkrole');
 
+
 // ===============================
-// CRÉER
+// CRÉER UNE COMMANDE
 // ===============================
 router.post(
   '/ajoutercommande',
   authentification,
-  checkrole(['Admin', 'Manager', 'Employe', 'Client']),
+  checkrole(['Admin', 'Client', 'Employe']),
   commandeController.createCommande
 );
 
+
 // ===============================
-// LISTER (par rôle)
+// MES COMMANDES (CLIENT)
+// ===============================
+router.get(
+  '/mes-commandes',
+  authentification,
+  checkrole(['Client']),
+  commandeController.getMyCommandes
+);
+
+
+// ===============================
+// TOUTES COMMANDES (ADMIN / STAFF)
 // ===============================
 router.get(
   '/getAllCommandes',
   authentification,
-  checkrole(['Admin', 'Manager', 'Employe', 'Client']),
+  checkrole(['Admin', 'Manager', 'Employe']),
   commandeController.getAllCommandes
 );
 
+
 // ===============================
-// PAR ID
+// GET BY ID
 // ===============================
 router.get(
   '/getCommandeByID/:id',
@@ -35,22 +49,6 @@ router.get(
   commandeController.getCommandeByID
 );
 
-// ===============================
-// PAR BOUTIQUE
-// ===============================
-router.get(
-  '/getCommandeByBoutique/:id',
-  authentification,
-  checkrole(['Admin', 'Manager', 'Employe']),
-  commandeController.getCommandeByBoutique
-);
-
-router.get(
-  '/getCommandesByClient/:id',
-  authentification,
-  checkrole(['Admin', 'Manager', 'Employe', 'Client']),
-  commandeController.getCommandesByClient
-);
 
 // ===============================
 // UPDATE
@@ -61,6 +59,7 @@ router.put(
   checkrole(['Admin', 'Manager']),
   commandeController.updateCommande
 );
+
 
 // ===============================
 // DELETE

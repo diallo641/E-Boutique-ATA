@@ -1,26 +1,20 @@
-const checkrole = (rolesautorises) =>
-{
-    return (req, res, next) =>
-    {
-        if(!req.user)
-        {
+const checkrole = (rolesautorises) => {
+    return (req, res, next) => {
+
+        if (!req.user || !req.user.Nom_role) {
             return res.status(401).json({ message: "Utilisateur non authentifié" });
         }
-        else
-        {
-            const userrole = req.user.Nom_role;
-            console.log("USER TOKEN :", req.user);
-            if(!rolesautorises.includes(userrole))
-            {
-                return res.status(403).json({ message: "Accès interdit : rôle pas autorisé" });
-            }
-            else
-            {
-                
-                next();
-            }
+
+        const userrole = req.user.Nom_role;
+
+        if (!rolesautorises.includes(userrole)) {
+            return res.status(403).json({
+                message: "Accès interdit : rôle non autorisé"
+            });
         }
-    }
+
+        next();
+    };
 };
 
 module.exports = checkrole;
