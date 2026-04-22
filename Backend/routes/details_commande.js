@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const detailController = require('../controllers/details_commande');
+console.log("DETAIL ROUTER LOADED");
 
 // ajouter un detail
 router.post('/ajouterdetail', detailController.ajouter_detail);

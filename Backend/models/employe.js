@@ -57,12 +57,20 @@ const updateEmploye = async (id, Nom, Prenom, Adresse, Telephone, ID_boutique, I
 };
 
 // Supprimer un employé
-const deleteEmploye = async (id) =>
-{
+const deleteEmploye = async (id, id_compte) => {
+    // 🔥 supprimer employé
     await db.query(
         "DELETE FROM employe WHERE ID_employe = ?",
         [id]
     );
+
+    // 🔥 supprimer compte lié
+    if (id_compte) {
+        await db.query(
+            "DELETE FROM compte WHERE ID_compte = ?",
+            [id_compte]
+        );
+    }
 
     return {
         message: "Employé supprimé avec succès",
@@ -101,6 +109,18 @@ const getEmployeByTelephone = async (Telephone) =>
 };
 
 
+const getEmployeByCompteID = async (ID_compte) => {
+    const [rows] = await db.query(
+        "SELECT * FROM employe WHERE ID_compte = ?",
+        [ID_compte]
+    );
+
+    return rows[0] || null;
+};
+
+
+
+
 
 // Exporter les fonctions
 module.exports =
@@ -112,5 +132,7 @@ module.exports =
     deleteEmploye,
     getEmployesByBoutiqueID,
     getEmployesByManagerID,
-    getEmployeByTelephone
+    getEmployeByTelephone,
+    getEmployeByCompteID
+
 };

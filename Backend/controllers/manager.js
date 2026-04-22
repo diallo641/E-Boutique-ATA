@@ -65,12 +65,31 @@ const getAllManagers = async (req, res) => {
 const getManagerByID = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
-        if (isNaN(id) || id <= 0) return res.status(400).json({ message: "ID invalide" });
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({ message: "ID invalide" });
+        }
 
-        const managerexistant = await managerModel.getManagerByID(id);
-        if (!managerexistant) return res.status(404).json({ message: "Manager inexistant" });
+        const manager = await managerModel.getManagerByID(id);
+        if (!manager) {
+            return res.status(404).json({ message: "Manager inexistant" });
+        }
 
-        return res.status(200).json({ message: "Manager récupéré", managerexistant });
+        // 🔥 récupérer compte lié
+        const compte = await compteModel.getCompteByID(manager.ID_compte);
+
+        if (!compte) {
+            return res.status(404).json({ message: "Compte inexistant" });
+        }
+
+        return res.status(200).json({
+            message: "Manager récupéré avec succès",
+            manager: {
+                ...manager,
+                Email: compte.Email,
+                ID_role: compte.ID_role
+            }
+        });
+
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -149,22 +168,47 @@ const updatemanager = async (req, res) => {
 const deleteManager = async (req, res) => {
     try {
         if (req.user.Nom_role !== "Admin") {
-            return res.status(403).json({ message: "Seul un Admin peut supprimer un manager" });
+            return res.status(403).json({
+                message: "Seul un Admin peut supprimer un manager"
+            });
         }
 
         const id = parseInt(req.params.id);
-        if (isNaN(id) || id <= 0) return res.status(400).json({ message: "ID invalide" });
 
-        const managerchercher = await managerModel.getManagerByID(id);
-        if (!managerchercher) return res.status(404).json({ message: "Manager inexistant" });
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({
+                message: "ID invalide"
+            });
+        }
 
+        const manager = await managerModel.getManagerByID(id);
+
+        if (!manager) {
+            return res.status(404).json({
+                message: "Manager inexistant"
+            });
+        }
+
+        // 🔥 suppression manager
         await managerModel.deleteManager(id);
-        return res.status(200).json({ message: "Manager supprimé avec succès" });
+
+        // 🔥 suppression compte associé
+        if (manager.ID_compte) {
+            await compteModel.deleteCompte(manager.ID_compte);
+        }
+
+        return res.status(200).json({
+            message: "Manager supprimé avec succès"
+        });
 
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({
+            message: error.message
+        });
     }
 };
+
+
 
 
 // Les employés dirigés par un manager
@@ -182,11 +226,32 @@ const getEmployesByManager = async (req, res) => {
     }
 };
 
+const getManagersByBoutique = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id) || id <= 0) {
+      return res.status(400).json({ message: "ID boutique invalide" });
+    }
+
+    const managers = await managerModel.getManagersByBoutique(id);
+
+    return res.status(200).json({
+      message: "Managers récupérés",
+      managers
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
     createManager,
     getAllManagers,
     getManagerByID,
     updatemanager,
     deleteManager,
-    getEmployesByManager
+    getEmployesByManager,
+    getManagersByBoutique
 };

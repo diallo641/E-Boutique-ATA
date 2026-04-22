@@ -18,6 +18,13 @@ import ProduitsAdmin from "./pages/Produits/produitsAdmin";
 import PageProduitsClient from "./pages/Clients/ProduitsClients";
 import AjouterCommande from "./pages/Commandes/AjouterCommande"; 
 import CommandeSuccess from "./pages/Clients/commande_success";
+import AjoutManager from "./pages/Managers/AjoutManager";
+import EditerManager from "./pages/Managers/EditerManager";
+import DeleteManager from "./pages/Managers/DeleteManager";
+import AjoutEmploye from "./pages/Employes/AjoutEmploye";
+import EditerEmploye from "./pages/Employes/EditerEmploye";
+import DeleteEmploye from "./pages/Employes/DeleteEmploye";
+import DashboardEmploye from "./pages/Employes/DashboardEmploye";
 
 
 function App() {
@@ -43,7 +50,15 @@ function App() {
         <Route path="/Produits" element={<ProduitsAdmin />} />
         <Route path="/client/produits" element={<PageProduitsClient />} />
         <Route path="/commande_success" element={<CommandeSuccess />} />
+        <Route path="/AjoutManager" element={<AjoutManager />} />
+        <Route path="/EditerManager/:id" element={<EditerManager />} />
+        <Route path="/DeleteManager/:id" element={<DeleteManager />} />
+        <Route path="/AjoutEmploye" element={<AjoutEmploye />} />
+        <Route path="/EditerEmploye/:id" element={<EditerEmploye />} />
+        <Route path="/DeleteEmploye/:id" element={<DeleteEmploye />} />
+        <Route path="/Dashboardemploye" element={<DashboardEmploye />} />
         
+      
       </Routes>
     </Router>
   );

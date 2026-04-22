@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { deconnexion } from "../JS/deconnexion";
 import { getDashboardStats } from "../JS/statisques";
+import HeaderAdmin from "../../composants/HeaderDashboard";
+
 
 function DashboardAdmin() {
 
@@ -11,23 +12,34 @@ function DashboardAdmin() {
     totalManagers: 0,
     totalEmployes: 0,
     totalCommandes: 0,
-    Nombreboutiques: 0,
+    totalBoutiques: 0,
     clients: []
   });
 
-  // 🔹 Charger les données au démarrage
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 🔹 Charger les données
   useEffect(() => {
     const fetchStats = async () => {
-      const data = await getDashboardStats();
-      if (data) {
-        setStats(data);
+      try {
+        const data = await getDashboardStats();
+        if (data) {
+          setStats(data);
+        } else {
+          setError("Erreur lors du chargement des statistiques");
+        }
+      } catch (err) {
+        setError("Erreur serveur");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStats();
   }, []);
 
-  //Construire les cartes statistiques
+  // 🔹 Cartes statistiques
   const statsCards = [
     { title: "Clients", value: stats.totalClients },
     { title: "Comptes", value: stats.totalComptes },
@@ -37,47 +49,46 @@ function DashboardAdmin() {
     { title: "Boutiques", value: stats.totalBoutiques }
   ];
 
-  //Prendre les 5 derniers clients
-  const recentClients = stats.clients.slice(0, 5);
+  // 🔹 Trier pour avoir les derniers clients
+  const recentClients = [...stats.clients]
+    .sort((a, b) => b.ID_client - a.ID_client)
+    .slice(0, 5);
+
+  // 🔹 Loading
+  if (loading) {
+    return (
+      <div className="p-6 text-center text-gray-600">
+        Chargement des données...
+      </div>
+    );
+  }
+
+  // 🔹 Erreur
+  if (error) {
+    return (
+      <div className="p-6 text-center text-red-500">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
-      
-      {/* Header */}
-      <header className="bg-white shadow p-4 flex flex-col md:flex-row md:justify-between md:items-center">
-        <h1 className="text-xl font-bold mb-4 md:mb-0">Dashboard Admin</h1>
-       
-        <nav className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
-          <Link to="/Manager" className="text-blue-500 hover:underline">Manager</Link>
-          <Link to="/employes" className="text-blue-500 hover:underline">Employes</Link>
-          <Link to="/Clients" className="text-blue-500 hover:underline">Clients</Link>
-          <Link to="/DashboardComptes" className="text-blue-500 hover:underline">Comptes</Link>
-          <Link to="/Categories" className="text-blue-500 hover:underline">Categories</Link>
-          <Link to="/Produits" className="text-blue-500 hover:underline">Produits</Link>
-          <Link to="/commandes" className="text-blue-500 hover:underline">Commandes</Link>
-          <Link to="/details" className="text-blue-500 hover:underline">Details</Link>
 
-          {/* Bouton déconnexion */}
-          <button
-            onClick={deconnexion}
-            className="ml-4 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
-          >
-            Déconnexion
-          </button>
-        </nav>
-      </header>
+      {/* Header */}
+      <HeaderAdmin />
 
       {/* Statistiques */}
       <section className="p-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
         {statsCards.map((stat, index) => (
-          <div key={index} className="bg-white p-4 rounded shadow text-center">
+          <div key={index} className="bg-white p-4 rounded shadow text-center hover:shadow-md transition">
             <h2 className="text-gray-500">{stat.title}</h2>
             <p className="text-2xl font-bold mt-2">{stat.value}</p>
           </div>
         ))}
       </section>
 
-      {/* Tableau clients récents */}
+      {/* Clients récents */}
       <section className="p-6">
         <h2 className="text-xl font-bold mb-4">Clients récents</h2>
 
@@ -87,7 +98,7 @@ function DashboardAdmin() {
               <tr>
                 <th className="px-4 py-2 text-left">Nom</th>
                 <th className="px-4 py-2 text-left">Téléphone</th>
-                <th className="px-4 py-2 text-left hidden md:table-cell">ID Compte</th>
+                <th className="px-4 py-2 text-left hidden md:table-cell">ID Client</th>
                 <th className="px-4 py-2 text-left hidden md:table-cell">Actions</th>
               </tr>
             </thead>
@@ -95,7 +106,7 @@ function DashboardAdmin() {
             <tbody>
               {recentClients.length > 0 ? (
                 recentClients.map((client) => (
-                  <tr key={client.ID_client} className="border-b">
+                  <tr key={client.ID_client} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-2">{client.Nom}</td>
                     <td className="px-4 py-2">{client.Telephone}</td>
                     <td className="px-4 py-2 hidden md:table-cell">{client.ID_client}</td>

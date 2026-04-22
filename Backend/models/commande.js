@@ -7,9 +7,13 @@ const createCommande = async ({ Total, Statut_commande = 'En cours', Mode_paieme
     const [result] = await db.query(
         "INSERT INTO commande (Total, Statut_commande, Mode_paiement, Date_commande, Date_modification, ID_client, ID_employe, ID_boutique) VALUES (?, ?, ?, NOW(), NOW(), ?, ?, ?)",
         [Total, Statut_commande, Mode_paiement, ID_client, ID_employe, ID_boutique]
+        
     );
+    const test = await db.query("SELECT * FROM commande WHERE ID_commande = ?", [result.insertId]);
+   console.log("VERIFICATION INSERT:", test[0]);
 
     const ID_commande = result.insertId;
+    console.log("RESULT INSERT:", result);
 
     // 🔥 Génération référence
     const annee = new Date().getFullYear();

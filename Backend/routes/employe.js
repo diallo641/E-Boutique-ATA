@@ -19,4 +19,11 @@ router.put('/updateEmploye/:id', authentification, checkrole(['Admin','Manager']
 // Supprimer un employé
 router.delete('/deleteEmploye/:id', authentification, checkrole(['Admin','Manager']), employeController.deleteEmploye);
 
+
+router.get(
+  "/dashboard",
+  authentification,
+  checkrole(["Employe"]),
+  employeController.getDashboardEmploye
+);
 module.exports = router;

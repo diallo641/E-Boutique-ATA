@@ -4,14 +4,14 @@ const commandeModel = require("../models/commande");
 
 
 // ===============================
-// AJOUTER UN PRODUIT
+// AJOUT DETAIL
 // ===============================
 const ajouter_detail = async (req, res) => {
     try {
         const { ID_commande, ID_produit, Prix, Quantite } = req.body;
 
         if (!ID_commande || !ID_produit || !Prix || !Quantite) {
-            return res.status(400).json({ message: "tous les champs sont requis" });
+            return res.status(400).json({ message: "Champs manquants" });
         }
 
         const commande = await commandeModel.getCommandeByID(ID_commande);
@@ -19,7 +19,6 @@ const ajouter_detail = async (req, res) => {
             return res.status(404).json({ message: "Commande introuvable" });
         }
 
-        // 🔒 VERROUILLAGE
         if (commande.Statut_commande === "VALIDÉE") {
             return res.status(403).json({ message: "Commande verrouillée" });
         }
@@ -32,11 +31,11 @@ const ajouter_detail = async (req, res) => {
             return res.status(404).json({ message: "Stock introuvable" });
         }
 
-        const detail_existant = await detailsModel.detailcommande(ID_commande, ID_produit);
+        const exist = await detailsModel.detailcommande(ID_commande, ID_produit);
 
-        if (detail_existant) {
+        if (exist) {
 
-            const nouvelleQuantite = detail_existant.Quantite + Quantite;
+            const newQty = exist.Quantite + Quantite;
 
             if (stock.Quantite < Quantite) {
                 return res.status(400).json({ message: "Stock insuffisant" });
@@ -48,7 +47,7 @@ const ajouter_detail = async (req, res) => {
                 ID_commande,
                 ID_produit,
                 Prix,
-                Quantite: nouvelleQuantite
+                Quantite: newQty
             });
 
         } else {
@@ -75,7 +74,7 @@ const ajouter_detail = async (req, res) => {
         });
 
         return res.status(201).json({
-            message: "Produit ajouté à la commande",
+            message: "Produit ajouté",
             total
         });
 
@@ -86,14 +85,14 @@ const ajouter_detail = async (req, res) => {
 
 
 // ===============================
-// MODIFIER UN PRODUIT
+// UPDATE DETAIL
 // ===============================
 const update_detail = async (req, res) => {
     try {
         const { ID_commande, ID_produit, Prix, Quantite } = req.body;
 
         if (!ID_commande || !ID_produit || !Prix || Quantite == null) {
-            return res.status(400).json({ message: "tous les champs sont requis" });
+            return res.status(400).json({ message: "Champs manquants" });
         }
 
         const commande = await commandeModel.getCommandeByID(ID_commande);
@@ -101,31 +100,27 @@ const update_detail = async (req, res) => {
             return res.status(404).json({ message: "Commande introuvable" });
         }
 
-        // 🔒 VERROUILLAGE
         if (commande.Statut_commande === "VALIDÉE") {
             return res.status(403).json({ message: "Commande verrouillée" });
         }
 
         const ID_boutique = commande.ID_boutique;
 
-        const ancien_detail = await detailsModel.detailcommande(ID_commande, ID_produit);
+        const old = await detailsModel.detailcommande(ID_commande, ID_produit);
 
-        if (!ancien_detail) {
-            return res.status(404).json({ message: "produit non trouvé dans la commande" });
+        if (!old) {
+            return res.status(404).json({ message: "Produit introuvable" });
         }
 
         const stock = await stockModel.getStockByProductAndBoutique(ID_produit, ID_boutique);
 
-        if (!stock) {
-            return res.status(404).json({ message: "Stock introuvable" });
+        const diff = Quantite - old.Quantite;
+
+        if (diff > 0 && stock.Quantite < diff) {
+            return res.status(400).json({ message: "Stock insuffisant" });
         }
 
-        const diff = Quantite - ancien_detail.Quantite;
-
         if (diff > 0) {
-            if (stock.Quantite < diff) {
-                return res.status(400).json({ message: "Stock insuffisant" });
-            }
             await stockModel.decrement_stock(ID_produit, ID_boutique, diff);
         }
 
@@ -148,7 +143,7 @@ const update_detail = async (req, res) => {
         });
 
         return res.status(200).json({
-            message: "detail mis à jour",
+            message: "Mis à jour OK",
             detail,
             total
         });
@@ -160,15 +155,15 @@ const update_detail = async (req, res) => {
 
 
 // ===============================
-// SUPPRIMER UN PRODUIT
+// DELETE DETAIL
 // ===============================
 const supprimer_detail = async (req, res) => {
     try {
-        const ID_commande = parseInt(req.params.id_commande);
-        const ID_produit = parseInt(req.params.id_produit);
+        const ID_commande = parseInt(req.params.ID_commande);
+        const ID_produit = parseInt(req.params.ID_produit);
 
         if (isNaN(ID_commande) || isNaN(ID_produit)) {
-            return res.status(400).json({ message: "parametres invalides" });
+            return res.status(400).json({ message: "Paramètres invalides" });
         }
 
         const commande = await commandeModel.getCommandeByID(ID_commande);
@@ -176,23 +171,22 @@ const supprimer_detail = async (req, res) => {
             return res.status(404).json({ message: "Commande introuvable" });
         }
 
-        // 🔒 VERROUILLAGE
         if (commande.Statut_commande === "VALIDÉE") {
             return res.status(403).json({ message: "Commande verrouillée" });
         }
 
         const ID_boutique = commande.ID_boutique;
 
-        const ancien_detail = await detailsModel.detailcommande(ID_commande, ID_produit);
+        const old = await detailsModel.detailcommande(ID_commande, ID_produit);
 
-        if (!ancien_detail) {
-            return res.status(404).json({ message: "produit non trouvé dans la commande" });
+        if (!old) {
+            return res.status(404).json({ message: "Produit introuvable" });
         }
 
         await stockModel.increment_stock(
             ID_produit,
             ID_boutique,
-            ancien_detail.Quantite
+            old.Quantite
         );
 
         await detailsModel.supprimerDetail(ID_commande, ID_produit);
@@ -211,7 +205,7 @@ const supprimer_detail = async (req, res) => {
         await commandeModel.updateCommande(updateData);
 
         return res.status(200).json({
-            message: "produit supprimé de la commande",
+            message: "Supprimé",
             total
         });
 
@@ -222,20 +216,20 @@ const supprimer_detail = async (req, res) => {
 
 
 // ===============================
-// LISTE DETAILS COMMANDE
+// GET DETAILS
 // ===============================
 const get_details_by_commande = async (req, res) => {
     try {
-        const ID_commande = parseInt(req.params.id);
+        const ID_commande = parseInt(req.params.ID_commande);
 
-        if (isNaN(ID_commande) || ID_commande <= 0) {
-            return res.status(400).json({ message: "id commande invalide" });
+        if (isNaN(ID_commande)) {
+            return res.status(400).json({ message: "ID invalide" });
         }
 
         const details = await detailsModel.getDetailsByCommande(ID_commande);
 
         return res.status(200).json({
-            message: "liste des details de la commande",
+            message: "OK",
             details
         });
 
@@ -244,8 +238,6 @@ const get_details_by_commande = async (req, res) => {
     }
 };
 
-
-// ===============================
 module.exports = {
     ajouter_detail,
     update_detail,

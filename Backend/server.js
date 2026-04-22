@@ -82,6 +82,7 @@ app.use("/api/commandes", commandeRoutes);
 app.use('/api/details', detailRoutes);
 app.use('/api/authentification', authentificationRoutes);
 
+
 // Test connexion MySQL
 db.getConnection()
   .then(() => console.log("✅ Connecté à MySQL"))
@@ -92,4 +93,5 @@ const port = process.env.PORT || 3000;
 //Demarage du server
 app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Serveur API démarré sur le port ${port}`);
+  
 })

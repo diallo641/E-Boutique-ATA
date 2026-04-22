@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { obtenirPanier, compterArticlesPanier } from "/src/pages/JS/Panier";
 
+
 function Headers() {
   const [isOpen, setIsOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);

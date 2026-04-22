@@ -19,16 +19,17 @@ const createCompte = async (Email, Mot_de_passe, ID_role) => {
 // Tous les comptes + nom du rôle
 const getAllComptes = async () => {
     const [rows] = await db.query(`
-        SELECT 
-            c.ID_compte,
-            c.Email,
-            c.Date_creation,
-            c.Date_modification,
-            r.ID_role,
-            r.Nom_role
-        FROM compte c
-        JOIN role r ON c.ID_role = r.ID_role order by c.ID_compte asc
-    `);
+    SELECT 
+        c.ID_compte,
+        c.Email,
+        c.Date_creation,
+        c.Date_modification,
+        r.ID_role,
+        r.Nom_role
+    FROM compte c
+    LEFT JOIN role r ON c.ID_role = r.ID_role
+    ORDER BY c.ID_compte ASC
+`);
     return rows;
 };
 

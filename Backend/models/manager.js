@@ -20,7 +20,23 @@ const getAllManagers = async () => {
 
 // Récupérer un manager par ID
 const getManagerByID = async (id) => {
-    const [rows] = await db.query("select * from manager where ID_manager = ?", [id]);
+    const [rows] = await db.query(
+        `SELECT 
+            m.ID_manager,
+            m.Nom,
+            m.Prenom,
+            m.Adresse,
+            m.Telephone,
+            m.ID_boutique,
+            c.Email,
+            c.ID_role,
+            c.ID_compte
+        FROM manager m
+        JOIN compte c ON m.ID_compte = c.ID_compte
+        WHERE m.ID_manager = ?`,
+        [id]
+    );
+
     return rows[0];
 };
 
@@ -37,8 +53,15 @@ const updateManager = async (id, Nom, Prenom, Adresse, Telephone, ID_boutique) =
 
 // Supprimer un manager
 const deleteManager = async (id) => {
-    await db.query("delete from manager where ID_manager = ?", [id]);
-    return { message: "Manager supprimé avec succès", ID_manager: id };
+    await db.query(
+        "DELETE FROM manager WHERE ID_manager = ?",
+        [id]
+    );
+
+    return {
+        message: "Manager supprimé avec succès",
+        ID_manager: id
+    };
 };
 
 
@@ -68,6 +91,14 @@ const getManagerByCompteID = async (ID_compte) => {
     return rows[0]; // retourne le manager correspondant
 };
 
+const getManagersByBoutique = async (id_boutique) => {
+  const [rows] = await db.query(
+    "SELECT * FROM manager WHERE ID_boutique = ?",
+    [id_boutique]
+  );
+  return rows;
+};
+
 
 
 // Exporter les fonctions
@@ -79,5 +110,6 @@ module.exports = {
     deleteManager,
     getManagerByTelephone,
     getEmployesByManagerID,
-    getManagerByCompteID
+    getManagerByCompteID,
+    getManagersByBoutique
 };

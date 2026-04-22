@@ -7,9 +7,9 @@ const checkrole = require('../middlewares/checkrole');
 //Creer un produit 
 router.post("/ajouterproduit", authentification, checkrole(['Admin','Manager']), produitController.createProduit);
 //Lister le sproduits
-router.get("/getAllProduits", authentification, checkrole(['Admin','Manager']),  produitController.getAllProduits);
+router.get("/getAllProduits", authentification, checkrole(['Admin','Manager', 'Client']),  produitController.getAllProduits);
 //Avoir un seul produit
-router.get("/unproduit/:id", authentification, checkrole(['Admin','Manager']), produitController.getProduitByID);
+router.get("/unproduit/:id", authentification, checkrole(['Admin','Manager', 'Client']), produitController.getProduitByID);
 //Modifier un produit 
 router.put("/modifierproduit/:id", authentification, checkrole(['Admin','Manager']), produitController.updateProduit);
 //Supprimer un produit

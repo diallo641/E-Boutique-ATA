@@ -1,86 +1,139 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AjouterAuPanier from "../../composants/AjouterPanier";
 
-// 📦 liste des produits
-const listeDesProduits = [
-  { id: 1, nom: "Produit 1", prix: 25000, image: "https://images.pexels.com/photos/8318201/pexels-photo-8318201.jpeg" },
-  { id: 2, nom: "Produit 2", prix: 15000, image: "https://images.pexels.com/photos/17539592/pexels-photo-17539592.jpeg" },
-  { id: 3, nom: "Casque Audio", prix: 20000, image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg" },
-  { id: 4, nom: "Ordinateur Portable", prix: 350000, image: "https://images.pexels.com/photos/267394/pexels-photo-267394.jpeg" },
-  { id: 5, nom: "Montre Connectée", prix: 45000, image: "https://images.pexels.com/photos/5082579/pexels-photo-5082579.jpeg" }
-];
+
 
 function ProduitsClient() {
 
-  const [termeRecherche, setTermeRecherche] = useState("");
-  const [produitsAffiches, setProduitsAffiches] = useState(listeDesProduits);
+  const [boutique, setBoutique] = useState("");
+  const [produits, setProduits] = useState([]);
+  const [recherche, setRecherche] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // 🔍 rechercher produits
-  const rechercherProduits = (e) => {
-    const valeur = e.target.value.toLowerCase();
-    setTermeRecherche(valeur);
-
-    const resultat = listeDesProduits.filter((produit) =>
-      produit.nom.toLowerCase().includes(valeur)
-    );
-
-    setProduitsAffiches(resultat);
+  const mappingBoutiques = {
+    "Dakar - Grand Dakar - Sham": 1,
+    "Dakar - Plateau": 2,
+    "Dakar - Parcelles": 3
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
+  const chargerProduits = async (idBoutique) => {
+    try {
+      setLoading(true);
 
-      {/* TITRE */}
-      <h1 className="text-2xl md:text-3xl font-bold mb-6">
-        🛒 Nos Produits
+      const res = await fetch(
+        `http://localhost:3000/api/stocks/stockboutique/${idBoutique}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
+
+      const data = await res.json();
+      const stocks = data.Stocks || [];
+
+      // 🔥 FILTRE STOCK > 0
+      const stocksDisponibles = stocks.filter(
+        (s) => Number(s.Quantite) > 0
+      );
+
+      const produitsTransformes = stocksDisponibles.map((s) => ({
+        ID_produit: s.ID_produit,
+        Nom_produit: s.Nom_produit,
+        Prix: Number(s.Prix),
+        Quantite: Number(s.Quantite)
+      }));
+
+      setProduits(produitsTransformes);
+
+    } catch (err) {
+      console.error("Erreur chargement:", err);
+      setProduits([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (boutique) {
+      chargerProduits(mappingBoutiques[boutique]);
+    } else {
+      setProduits([]);
+    }
+  }, [boutique]);
+
+  const produitsFiltres = produits.filter((p) =>
+    (p.Nom_produit ?? "")
+      .toLowerCase()
+      .includes((recherche ?? "").toLowerCase())
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4">
+
+      <h1 className="text-2xl font-bold mb-4">
+        🛒 Produits par boutique
       </h1>
 
-      {/* BARRE DE RECHERCHE */}
+      {/* BOUTIQUE */}
+      <select
+        className="border p-2 mb-4 w-full md:w-1/2"
+        value={boutique}
+        onChange={(e) => setBoutique(e.target.value)}
+      >
+        <option value="">-- Choisir une boutique --</option>
+        <option value="Dakar - Grand Dakar - Sham">Dakar - Grand Dakar - Sham</option>
+        <option value="Dakar - Plateau">Dakar - Plateau</option>
+        <option value="Dakar - Parcelles">Dakar - Parcelles</option>
+      </select>
+
+      {/* RECHERCHE */}
       <input
         type="text"
-        placeholder="Rechercher un produit..."
-        value={termeRecherche}
-        onChange={rechercherProduits}
-        className="w-full md:w-1/2 p-2 border rounded mb-6"
+        placeholder="Rechercher produit..."
+        className="border p-2 w-full md:w-1/2 mb-6"
+        value={recherche}
+        onChange={(e) => setRecherche(e.target.value)}
       />
 
-      {/* LISTE PRODUITS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {/* ETATS */}
+      {!boutique ? (
+        <p className="text-center">Veuillez choisir une boutique</p>
+      ) : loading ? (
+        <p className="text-center">Chargement...</p>
+      ) : produitsFiltres.length === 0 ? (
+        <p className="text-center">Aucun produit disponible</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-        {produitsAffiches.map((produit) => (
-          <div
-            key={produit.id}
-            className="bg-white rounded shadow hover:shadow-lg transition p-3"
-          >
+          {produitsFiltres.map((p) => (
+            <div key={p.ID_produit} className="bg-white p-3 rounded shadow">
 
-            {/* IMAGE */}
-            <img
-              src={produit.image}
-              alt={produit.nom}
-              className="w-full h-48 object-cover rounded"
-            />
+              <h3 className="font-bold">{p.Nom_produit}</h3>
 
-            {/* INFOS */}
-            <h2 className="font-bold mt-3">{produit.nom}</h2>
+              <p>{p.Prix.toLocaleString()} FCFA</p>
 
-            <p className="text-gray-600">
-              {produit.prix.toLocaleString()} FCFA
-            </p>
+              <p className="text-sm text-gray-500">
+                Stock : {p.Quantite}
+              </p>
 
-            {/* BOUTON AJOUT PANIER */}
-            <AjouterAuPanier
-              produit={{
-                id: produit.id,
-                nom: produit.nom,
-                prix: produit.prix,
-                image: produit.image
-              }}
-            />
+              <AjouterAuPanier
+                produit={{
+                  id: p.ID_produit,
+                  nom: p.Nom_produit,
+                  prix: p.Prix,
+                  image: "https://images.pexels.com/photos/8318201/pexels-photo-8318201.jpeg",
+                  ID_boutique: mappingBoutiques[boutique],
+                  quantiteStock: p.Quantite // 🔥 important
+                }}
+              />
 
-          </div>
-        ))}
+            </div>
+          ))}
 
-      </div>
+        </div>
+      )}
+
     </div>
   );
 }

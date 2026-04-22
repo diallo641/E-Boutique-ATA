@@ -344,10 +344,6 @@ const updateProfile = async (req, res) => {
 };
 
 
-
-
-
-module.exports = { updateProfile };
 //Export de toutes les fonctions
 module.exports = {
     inscription,

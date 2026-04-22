@@ -1,6 +1,5 @@
 const BASE_URL = "http://localhost:3000/api";
 
-//Fonction générique avec token
 const fetchData = async (url) => {
     try {
         const token = localStorage.getItem("token");
@@ -33,53 +32,43 @@ const fetchData = async (url) => {
     }
 };
 
-
-//COMPTES
-
+// COMPTES
 export const getComptes = async () => {
     const data = await fetchData(`${BASE_URL}/comptes/getAllComptes`);
     return data?.comptes || [];
 };
 
-
-//CLIENTS
-
+// CLIENTS
 export const getClients = async () => {
     const data = await fetchData(`${BASE_URL}/clients/getAllClients`);
     return data?.clients || [];
 };
 
-
-//MANAGERS
+// MANAGERS ✅ FIX ICI
 export const getManagers = async () => {
     const data = await fetchData(`${BASE_URL}/managers/getAllManagers`);
-    return data?.Managers || [];
+    return data?.Managers || data?.managers || [];
 };
 
-
-//EMPLOYÉS
+// EMPLOYÉS
 export const getEmployes = async () => {
     const data = await fetchData(`${BASE_URL}/employes/getAllEmployes`);
     return data?.employes || [];
 };
 
-
-//BOUTIQUES
+// BOUTIQUES
 export const getBoutiques = async () => {
     const data = await fetchData(`${BASE_URL}/boutiques/getAllBoutiques`);
-    console.log("Boutiques récupérées :", data?.boutiques);
     return data?.boutiques || [];
 };
 
-
-//COMMANDES
+// COMMANDES
 export const getCommandes = async () => {
     const data = await fetchData(`${BASE_URL}/commandes/getAllCommandes`);
     return data?.commandes || [];
 };
 
-
-//STATS GLOBAL DASHBOARD
+// DASHBOARD STATS
 export const getDashboardStats = async () => {
     try {
         const [

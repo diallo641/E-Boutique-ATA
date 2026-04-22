@@ -9,41 +9,63 @@ const employeModel = require('../models/employe');
 // -------------------
 const createCommande = async (req, res) => {
     try {
-        const { Total, Mode_paiement, ID_boutique } = req.body;
+        let { Total, Mode_paiement, ID_boutique } = req.body;
 
-        if (!Total || !Mode_paiement || !ID_boutique) {
-            return res.status(400).json({ message: "Champs obligatoires manquants" });
+        // =========================
+        // VALIDATION ROBUSTE
+        // =========================
+        Total = Number(Total);
+        ID_boutique = Number(ID_boutique);
+
+        if (isNaN(Total) || Total <= 0 || !Mode_paiement || isNaN(ID_boutique)) {
+            return res.status(400).json({ message: "Champs invalides ou incomplets" });
         }
 
-        // client connecté (via compte)
+        console.log("BODY COMMANDE:", req.body);
+        console.log("USER:", req.user);
+
+        // =========================
+        // CLIENT
+        // =========================
         const client = await clientModel.getClientProfile(req.user.ID_compte);
+
         if (!client) {
             return res.status(404).json({ message: "Client introuvable" });
         }
 
-        // boutique existe
+        // =========================
+        // BOUTIQUE
+        // =========================
+        console.log("TOKEN USER:", req.user);
         const boutique = await boutiqueModel.getBoutiqueByID(ID_boutique);
+
         if (!boutique) {
             return res.status(404).json({ message: "Boutique inexistante" });
         }
 
         let ID_employe = null;
 
-        // si employé
+        // =========================
+        // EMPLOYE CHECK
+        // =========================
         if (req.user.Nom_role === "Employe") {
+
             const employe = await employeModel.getEmployeByCompteID(req.user.ID_compte);
 
             if (!employe) {
                 return res.status(404).json({ message: "Employé introuvable" });
             }
 
-            ID_employe = employe.ID_employe;
-
-            if (employe.ID_boutique !== ID_boutique) {
+            if (Number(employe.ID_boutique) !== ID_boutique) {
                 return res.status(403).json({ message: "Accès interdit boutique" });
             }
+
+            ID_employe = employe.ID_employe;
         }
 
+        // =========================
+        // CREATION COMMANDE
+        // =========================
         const nouvelleCommande = await commandeModel.createCommande({
             Total,
             Statut_commande: "En attente",
@@ -53,12 +75,17 @@ const createCommande = async (req, res) => {
             ID_boutique
         });
 
+        if (!nouvelleCommande) {
+            return res.status(500).json({ message: "Erreur création commande" });
+        }
+
         return res.status(201).json({
             message: "Commande créée avec succès",
             Commande: nouvelleCommande
         });
 
     } catch (error) {
+        console.error("CREATE COMMANDE ERROR:", error);
         return res.status(500).json({ message: error.message });
     }
 };

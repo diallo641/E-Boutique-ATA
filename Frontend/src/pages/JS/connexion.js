@@ -51,7 +51,7 @@ export async function ConnexionForm(e) {
         console.log(role);
         window.location.href = "/Manager";
       } else if(role === "Employe") {
-        window.location.href = "/employes";
+        window.location.href = "/Dashboardemploye";
       }
        else {
         window.location.href = "/Dashboardclient";

@@ -7,19 +7,30 @@ function AjouterAuPanier({ produit }) {
   const [confirmation, setConfirmation] = useState(false);
 
   const ajouter = () => {
-    ajouterAuPanier(produit, Number(quantite));
+
+    if (!produit?.ID_boutique) {
+      alert("Erreur: boutique non définie dans produit");
+      return;
+    }
+
+    ajouterAuPanier(
+      {
+        id: produit.id,
+        nom: produit.nom,
+        prix: produit.prix,
+        image: produit.image,
+        ID_boutique: produit.ID_boutique
+      },
+      Number(quantite)
+    );
 
     setConfirmation(true);
-
-    setTimeout(() => {
-      setConfirmation(false);
-    }, 2000);
+    setTimeout(() => setConfirmation(false), 2000);
   };
 
   return (
     <div className="mt-4">
 
-      {/* QUANTITÉ + BOUTON */}
       <div className="flex items-center space-x-2">
 
         <input
@@ -32,17 +43,16 @@ function AjouterAuPanier({ produit }) {
 
         <button
           onClick={ajouter}
-          className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600"
+          className="bg-blue-500 text-white px-3 py-2 rounded"
         >
           Ajouter
         </button>
 
       </div>
 
-      {/* MESSAGE CONFIRMATION */}
       {confirmation && (
         <p className="text-green-600 text-sm mt-1">
-          Produit ajouté au panier ✔️
+          Produit ajouté ✔️
         </p>
       )}
 
