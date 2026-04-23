@@ -1,5 +1,6 @@
 const stockModel = require('../models/stock');
 const managerModel = require('../models/manager');
+const { get } = require('mongoose');
 
 
 // -------------------
@@ -90,19 +91,41 @@ const getAllStocks = async (req, res) => {
 };
 
 
-// -------------------
-// Stock par produit
-// -------------------
+// STOCK TOTAL PAR PRODUIT
 const getStockByProductID = async (req, res) => {
     try {
-        const { ID_produit } = req.params;
+        const id = parseInt(req.params.id);
 
-        const stocks = await stockModel.getStockByProductID(ID_produit);
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({ message: "ID produit invalide" });
+        }
+
+        const stock = await stockModel.getStockByProductID(id);
 
         return res.status(200).json({
-            message: stocks.length === 0 ? "Aucun stock trouvé" : "Stocks récupérés",
-            total: stocks.length,
-            Stocks: stocks
+            message: "Stock récupéré avec succès",
+            Stock: stock
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// Stock total par produit
+const getStockByProduitSimple = async (req, res) => {
+    try {
+        const ID_produit = parseInt(req.params.ID_produit);
+
+        if (isNaN(ID_produit)) {
+            return res.status(400).json({ message: "ID invalide" });
+        }
+
+        const stock = await stockModel.getStockByProductID(ID_produit);
+
+        return res.status(200).json({
+            message: "Stock récupéré",
+            Stock: stock || { Quantite: 0 }
         });
 
     } catch (error) {
@@ -272,5 +295,6 @@ module.exports = {
     getStockByBoutique,
     getStockByProductAndBoutique,
     updateStock,
-    deleteStock
+    deleteStock,
+    getStockByProduitSimple
 };

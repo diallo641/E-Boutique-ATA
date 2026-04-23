@@ -118,7 +118,8 @@ const updateProduit = async(req, res) =>
                 }
                 else
                 {
-                    const categorieexistant = await categorieModel.getCategorieById(ID_categorie);
+                    
+                    const categorieexistant = await categorieModel.getCategorieByID(ID_categorie);
                     if(!categorieexistant)
                     {
                         return res.status(404).json({message: "Categorie non trouvée"});

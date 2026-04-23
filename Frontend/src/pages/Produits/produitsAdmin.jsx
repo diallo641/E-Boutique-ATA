@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { deconnexion } from "../JS/deconnexion";
 import { useEffect, useState } from "react";
 import { getProduits, getStockByProduit, formatDateFR } from "../JS/statistiqueproduits";
+import HeaderAdmin from "../../composants/HeaderDashboard";
 
 function ProduitsAdmin() {
 
@@ -28,12 +28,8 @@ function ProduitsAdmin() {
       const map = {};
 
       for (const prod of produits) {
-        const stocks = await getStockByProduit(prod.ID_produit);
-
-        map[prod.ID_produit] = stocks.reduce(
-          (sum, s) => sum + s.Quantite,
-          0
-        );
+        const stock = await getStockByProduit(prod.ID_produit);
+        map[prod.ID_produit] = stock || 0;
       }
 
       setStockMap(map);
@@ -44,42 +40,12 @@ function ProduitsAdmin() {
     }
   }, [produits]);
 
-  // =======================
-  // GET STOCK SIMPLE
-  // =======================
-  const getStock = (id) => {
-    return stockMap[id] || 0;
-  };
+  const getStock = (id) => stockMap[id] || 0;
 
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* HEADER */}
-      <header className="bg-white shadow p-4 flex flex-col md:flex-row md:justify-between md:items-center">
-
-        <h1 className="text-xl font-bold mb-4 md:mb-0">
-          Dashboard Produits
-        </h1>
-
-        <nav className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
-
-          <Link to="/Manager" className="text-blue-500 hover:underline">Manager</Link>
-          <Link to="/employes" className="text-blue-500 hover:underline">Employés</Link>
-          <Link to="/Clients" className="text-blue-500 hover:underline">Clients</Link>
-          <Link to="/Comptes" className="text-blue-500 hover:underline">Comptes</Link>
-          <Link to="/Categories" className="text-blue-500 hover:underline">Catégories</Link>
-          <Link to="/Produits" className="text-blue-500 hover:underline">Produits</Link>
-          <Link to="/commandes" className="text-blue-500 hover:underline">Commandes</Link>
-
-          <button
-            onClick={deconnexion}
-            className="ml-4 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Déconnexion
-          </button>
-
-        </nav>
-      </header>
+      <HeaderAdmin />
 
       {/* TOP */}
       <section className="p-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -90,9 +56,12 @@ function ProduitsAdmin() {
           className="w-full md:w-1/3 px-4 py-2 border rounded"
         />
 
-        <button className="px-4 py-2 bg-blue-500 text-white rounded">
+        <Link
+          to="/AjoutProduit"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
           + Ajouter un produit
-        </button>
+        </Link>
 
       </section>
 
@@ -148,17 +117,19 @@ function ProduitsAdmin() {
 
                     <td className="px-4 py-2 hidden md:table-cell space-x-2">
 
-                      <button className="px-2 py-1 bg-green-500 text-white rounded">
-                        Voir
-                      </button>
-
-                      <button className="px-2 py-1 bg-yellow-500 text-white rounded">
+                      <Link
+                        to={`/EditerProduit/${prod.ID_produit}`}
+                        className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      >
                         Modifier
-                      </button>
+                      </Link>
 
-                      <button className="px-2 py-1 bg-red-500 text-white rounded">
+                      <Link
+                        to={`/DeleteProduit/${prod.ID_produit}`}
+                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                      >
                         Supprimer
-                      </button>
+                      </Link>
 
                     </td>
 

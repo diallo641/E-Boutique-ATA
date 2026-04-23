@@ -25,4 +25,12 @@ router.put('/modifierstock/:ID_produit/:ID_boutique', authentification, checkrol
 // 🔹 Supprimer un stock
 router.delete('/deletestock/:ID_produit/:ID_boutique', authentification, checkrole(['Admin','Manager']), stockController.deleteStock);
 
+router.get(
+  '/stock-produit/:ID_produit',
+  authentification,
+  checkrole(['Admin','Manager','Client']),
+  stockController.getStockByProduitSimple
+);
+
+
 module.exports = router;

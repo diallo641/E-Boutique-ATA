@@ -126,9 +126,18 @@ const increment_stock = async (ID_produit, ID_boutique, quantite) => {
     return nouvelleQuantite;
 };
 
-// =========================
+const getStockByProductID = async (ID_produit) => {
+    const [rows] = await db.query(
+        "SELECT SUM(Quantite) as Quantite FROM stock WHERE ID_produit = ?",
+        [ID_produit]
+    );
+
+    return rows[0];
+};
+
+
 // EXPORT
-// =========================
+
 module.exports = {
     createStock,
     getAllStocks,
@@ -138,5 +147,6 @@ module.exports = {
     getStockByBoutique,
     getStockByProductAndBoutique,
     decrement_stock,
-    increment_stock
+    increment_stock,
+    getStockByProductID
 };

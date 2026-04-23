@@ -35,6 +35,9 @@ import DeleteCompte from "./pages/Comptes/DeleteCompte";
 import AjoutCategorie from "./pages/Categories/AjoutCategorie"
 import EditerCategorie from "./pages/Categories/EditerCategorie";
 import DeleteCategorie from "./pages/Categories/DeleteCategorie";
+import Ajoutproduit from "./pages/Produits/AjoutProduit";
+import EditerProduit from "./pages/Produits/EditerProduit";
+import DeleteProduit from "./pages/Produits/DeleteProduit";
 
 
 function App() {
@@ -77,6 +80,9 @@ function App() {
         <Route path="/AjoutCategorie" element={<AjoutCategorie />} />
         <Route path="/EditerCategorie/:id" element={<EditerCategorie />} />
         <Route path="/DeleteCategorie/:id" element={<DeleteCategorie />} />
+        <Route path="/AjoutProduit" element={<Ajoutproduit />} />
+        <Route path="/EditerProduit/:id" element={<EditerProduit />} />
+        <Route path="/DeleteProduit/:id" element={<DeleteProduit />} />
 
       
       </Routes>

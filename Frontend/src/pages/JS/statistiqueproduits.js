@@ -44,11 +44,13 @@ export const getProduits = async () => {
 };
 
 // =======================
-// STOCK PAR PRODUIT
+// STOCK PAR PRODUIT (CORRIGÉ)
 // =======================
 export const getStockByProduit = async (ID_produit) => {
-    const data = await fetchData(`${BASE_URL}/stocks/stockproduit/${ID_produit}`);
-    return data?.Stocks || [];
+    const data = await fetchData(`${BASE_URL}/stocks/stock-produit/${ID_produit}`);
+
+    // backend: { Stock: { Quantite: x } }
+    return data?.Stock?.Quantite || 0;
 };
 
 // =======================
