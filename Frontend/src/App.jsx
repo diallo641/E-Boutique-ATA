@@ -25,6 +25,10 @@ import AjoutEmploye from "./pages/Employes/AjoutEmploye";
 import EditerEmploye from "./pages/Employes/EditerEmploye";
 import DeleteEmploye from "./pages/Employes/DeleteEmploye";
 import DashboardEmploye from "./pages/Employes/DashboardEmploye";
+import AjoutClient from "./pages/Clients/AjoutClient";
+import ProfilClient from "./pages/Clients/ProfilClient";
+import EditerClient from "./pages/Clients/EditerClient";
+import DeleteClient from "./pages/Clients/DeleteClient";
 
 
 function App() {
@@ -57,7 +61,11 @@ function App() {
         <Route path="/EditerEmploye/:id" element={<EditerEmploye />} />
         <Route path="/DeleteEmploye/:id" element={<DeleteEmploye />} />
         <Route path="/Dashboardemploye" element={<DashboardEmploye />} />
-        
+        <Route path="/AjoutClient" element={<AjoutClient />} />
+        <Route path="/ProfilClient/:id" element={<ProfilClient />} />
+        <Route path="/EditerClient/:id" element={<EditerClient />} />
+        <Route path="/DeleteClient/:id" element={<DeleteClient />} />
+
       
       </Routes>
     </Router>

@@ -31,12 +31,19 @@ const getAllClients = async () => {
 //Un client par ID_client
 const getClientByID = async (id) => {
     const [rows] = await db.query(
-        `SELECT c.ID_client, c.Nom, c.Adresse, c.Telephone, cp.Email
+        `SELECT 
+            c.ID_client, 
+            c.Nom, 
+            c.Adresse, 
+            c.Telephone, 
+            c.ID_compte,
+            cp.Email
          FROM client c
          JOIN compte cp ON c.ID_compte = cp.ID_compte
          WHERE c.ID_client = ?`,
         [id]
     );
+
     return rows[0];
 };
 
@@ -69,14 +76,22 @@ const updateClientProfile = async (ID_compte, Nom, Adresse, Telephone) => {
 
 //Supprimer un client
 const deleteClient = async (id) => {
+    //récupérer le client pour avoir ID_compte
     const client = await getClientByID(id);
     if (!client) return null;
 
+    const ID_compte = client.ID_compte;
+
+    //supprimer le client
     await db.query("DELETE FROM client WHERE ID_client = ?", [id]);
 
-    return { 
-        message: "Client supprimé avec succès", 
-        ID_client: id 
+    //supprimer le compte associé
+    await db.query("DELETE FROM compte WHERE ID_compte = ?", [ID_compte]);
+
+    return {
+        message: "Client et compte supprimés avec succès",
+        ID_client: id,
+        ID_compte
     };
 };
 
@@ -109,6 +124,22 @@ const getClientByCompteID = async (ID_compte) => {
     return rows[0];
 };
 
+const updateClient = async (id, Nom, Adresse, Telephone) => {
+    await db.query(
+        `UPDATE client 
+         SET Nom = ?, Adresse = ?, Telephone = ?
+         WHERE ID_client = ?`,
+        [Nom, Adresse, Telephone, id]
+    );
+
+    return {
+        ID_client: id,
+        Nom,
+        Adresse,
+        Telephone
+    };
+};
+
 // Export
 module.exports = {
     createClient,
@@ -119,5 +150,6 @@ module.exports = {
     deleteClient,
     getClientByTelephone,
     getClientsByBoutiqueID,
-    getClientByCompteID
+    getClientByCompteID,
+    updateClient
 }

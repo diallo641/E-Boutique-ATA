@@ -19,6 +19,9 @@ router.get("/unclient/:id",  authentification, checkrole(['Admin','Manager', 'Em
 // Modifier un client
 router.put('/editerclient/:id',  authentification,  checkrole(['Admin','Manager', 'Employe']),  clientController.update);
 
+// Modifier un client Admin / Manager / Employe
+router.put('/updateclient/:id',  authentification,  checkrole(['Admin','Manager', 'Employe']),  clientController.updateClient);
+
 // Supprimer un client
 router.delete('/supprimerclient/:id', authentification, checkrole(['Admin','Manager']),  clientController.deleteClient
 );

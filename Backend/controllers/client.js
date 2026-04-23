@@ -48,31 +48,62 @@ const inscription = async (req, res) => {
 //CRUD classique pour Admin / Manager / Employé
 const createclient = async (req, res) => {
     try {
-        const { Nom, Adresse, Telephone, Email, Mot_de_passe, ID_role, ID_boutique } = req.body;
+        const { Nom, Adresse, Telephone, Email, Mot_de_passe, ID_role } = req.body;
 
+        // 🔹 Vérification des champs obligatoires
         if (!Nom || !Adresse || !Telephone || !Email || !Mot_de_passe || !ID_role) {
             return res.status(400).json({ message: "Tous les champs sont obligatoires" });
         }
 
+        // 🔹 Vérifier si le rôle existe
         const roleExistant = await roleModel.getRoleById(ID_role);
-        if (!roleExistant) return res.status(404).json({ message: "Rôle inexistant" });
-
-        if (await compteModel.getCompteByEmail(Email)) return res.status(409).json({ message: "Email déjà utilisé" });
-        if (await clientModel.getClientByTelephone(Telephone)) return res.status(409).json({ message: "Numéro de téléphone déjà utilisé" });
-
-        if (req.user.Nom_role === "Manager" || req.user.Nom_role === "Employe") {
-            if (!ID_boutique || ID_boutique !== req.user.ID_boutique) {
-                return res.status(403).json({ message: "Vous ne pouvez créer que des clients pour votre boutique" });
-            }
+        if (!roleExistant) {
+            return res.status(404).json({ message: "Rôle inexistant" });
         }
 
+        // 🔹 Vérifier email et téléphone uniques
+        if (await compteModel.getCompteByEmail(Email)) {
+            return res.status(409).json({ message: "Email déjà utilisé" });
+        }
+
+        if (await clientModel.getClientByTelephone(Telephone)) {
+            return res.status(409).json({ message: "Numéro de téléphone déjà utilisé" });
+        }
+
+        // 🔥 Gestion intelligente de la boutique
+        let ID_boutique_final = null;
+
+        if (req.user.Nom_role === "Manager" || req.user.Nom_role === "Employe") {
+            // 👉 On force la boutique depuis le token
+            ID_boutique_final = req.user.ID_boutique;
+        } 
+        else if (req.user.Nom_role === "Admin") {
+            // 👉 Admin peut avoir une boutique ou pas
+            ID_boutique_final = req.body.ID_boutique || null;
+        }
+
+        // 🔹 Hash mot de passe
         const hash = await bcrypt.hash(Mot_de_passe, 10);
+
+        // 🔹 Création compte
         const nouveauCompte = await compteModel.createCompte(Email, hash, ID_role);
-        const nouveauClient = await clientModel.createClient(Nom, Adresse, Telephone, nouveauCompte.ID_compte);
+
+        // 🔹 Création client (avec boutique si ton modèle le gère)
+        const nouveauClient = await clientModel.createClient(
+            Nom,
+            Adresse,
+            Telephone,
+            nouveauCompte.ID_compte,
+            ID_boutique_final // 👈 important si ta table le supporte
+        );
 
         return res.status(201).json({
             message: "Client créé avec succès",
-            Compte: { ID_compte: nouveauCompte.ID_compte, Email, ID_role },
+            Compte: {
+                ID_compte: nouveauCompte.ID_compte,
+                Email,
+                ID_role
+            },
             Client: nouveauClient
         });
 
@@ -174,62 +205,79 @@ const updateClient = async (req, res) => {
 //Modifier un client
 const update = async (req, res) => {
     try {
-        const id = parseInt(req.params.id); 
+        const id = parseInt(req.params.id);
         const { Nom, Adresse, Telephone, Email, Mot_de_passe } = req.body;
 
-        if (isNaN(id) || id <= 0) return res.status(400).json({ message: "ID invalide" });
-
-        // 🔹 Récupérer le client et le compte existants
-        const clientExistant = await clientModel.getClientByID(id);
-        if (!clientExistant) return res.status(404).json({ message: "Client non trouvé" });
-
-        const compteExistant = await compteModel.getCompteByID(clientExistant.ID_compte);
-        if (!compteExistant) return res.status(404).json({ message: "Compte associé non trouvé" });
-
-        // 🔹 Contrôle pour Manager/Employé : ne peut modifier que ses clients
-        if ((req.user.Nom_role === "Manager" || req.user.Nom_role === "Employe") &&
-            clientExistant.ID_boutique !== req.user.ID_boutique) {
-            return res.status(403).json({ message: "Vous ne pouvez modifier que les clients de votre boutique" });
+        // 🔹 Vérif ID
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({ message: "ID invalide" });
         }
 
-        // 🔹 Vérifier l'unicité du téléphone
+        // 🔹 Récupération client
+        const clientExistant = await clientModel.getClientByID(id);
+        if (!clientExistant) {
+            return res.status(404).json({ message: "Client non trouvé" });
+        }
+
+        // 🔹 Récupération compte associé
+        const compteExistant = await compteModel.getCompteByID(clientExistant.ID_compte);
+        if (!compteExistant) {
+            return res.status(404).json({ message: "Compte associé non trouvé" });
+        }
+
+        // 🔒 Sécurité boutique (Manager / Employé)
+        if (
+            (req.user.Nom_role === "Manager" || req.user.Nom_role === "Employe") &&
+            clientExistant.ID_boutique !== req.user.ID_boutique
+        ) {
+            return res.status(403).json({
+                message: "Vous ne pouvez modifier que les clients de votre boutique"
+            });
+        }
+
+        // 🔹 Vérif téléphone unique
         if (Telephone && Telephone !== clientExistant.Telephone) {
-            const telExistant = await clientModel.getClientByTelephone(Telephone);
-            if (telExistant && telExistant.ID_client !== id) {
+            const telExiste = await clientModel.getClientByTelephone(Telephone);
+
+            if (telExiste && telExiste.ID_client !== clientExistant.ID_client) {
                 return res.status(409).json({ message: "Numéro de téléphone déjà utilisé" });
             }
         }
 
-        // 🔹 Vérifier l'unicité de l'email
+        // 🔹 Vérif email unique
         let nouvelEmail = compteExistant.Email;
+
         if (Email && Email !== compteExistant.Email) {
             const emailExiste = await compteModel.getCompteByEmail(Email);
+
             if (emailExiste && emailExiste.ID_compte !== compteExistant.ID_compte) {
                 return res.status(409).json({ message: "Email déjà utilisé" });
             }
+
             nouvelEmail = Email;
         }
 
-        // 🔹 Vérifier et hash du mot de passe si fourni
+        // 🔹 Gestion mot de passe
         let nouveauMotDePasse = compteExistant.Mot_de_passe;
+
         if (Mot_de_passe) {
             nouveauMotDePasse = await bcrypt.hash(Mot_de_passe, 10);
         }
 
-        // 🔹 Mettre à jour le compte
+        // 🔄 Update COMPTE
         await compteModel.updateCompte(
             compteExistant.ID_compte,
             nouvelEmail,
             nouveauMotDePasse,
-            compteExistant.ID_role // garder le rôle existant
+            compteExistant.ID_role
         );
 
-        // 🔹 Mettre à jour le client
+        // 🔄 Update CLIENT (IMPORTANT : ID_CLIENT utilisé ici)
         const clientModifie = await clientModel.updateClientProfile(
-            compteExistant.ID_compte,
-            Nom || clientExistant.Nom,
-            Adresse || clientExistant.Adresse,
-            Telephone || clientExistant.Telephone
+            clientExistant.ID_client,
+            Nom ?? clientExistant.Nom,
+            Adresse ?? clientExistant.Adresse,
+            Telephone ?? clientExistant.Telephone
         );
 
         return res.status(200).json({
@@ -239,7 +287,7 @@ const update = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("Erreur update client :", error);
         return res.status(500).json({ message: error.message });
     }
 };
@@ -344,6 +392,11 @@ const updateProfile = async (req, res) => {
 };
 
 
+
+
+
+
+
 //Export de toutes les fonctions
 module.exports = {
     inscription,
@@ -355,5 +408,6 @@ module.exports = {
     deleteClient,
     getProfile,
     updateProfile,
+    
    
 }
