@@ -48,6 +48,15 @@ const getProduitByName = async(Nom_produit) =>
 
 }
 
+
+const getProduitsByCategorie = async (id_categorie) => {
+  const [rows] = await db.query(
+    "SELECT * FROM produit WHERE ID_categorie = ?",
+    [id_categorie]
+  );
+  return rows;
+};
+
 //Exporter les focntions
 module.exports = 
 {
@@ -56,5 +65,6 @@ module.exports =
     getProduitByID, 
     updateProduit,
     deleteProduit,
-    getProduitByName
+    getProduitByName,
+    getProduitsByCategorie
 };

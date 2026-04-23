@@ -14,7 +14,7 @@ function HeaderAdmin() {
         <Link to="/Manager" className="text-blue-500 hover:underline">Manager</Link>
         <Link to="/employes" className="text-blue-500 hover:underline">Employés</Link>
         <Link to="/Clients" className="text-blue-500 hover:underline">Clients</Link>
-        <Link to="/DashboardComptes" className="text-blue-500 hover:underline">Comptes</Link>
+        <Link to="/Comptes" className="text-blue-500 hover:underline">Comptes</Link>
         <Link to="/Categories" className="text-blue-500 hover:underline">Categories</Link>
         <Link to="/Produits" className="text-blue-500 hover:underline">Produits</Link>
         <Link to="/commandes" className="text-blue-500 hover:underline">Commandes</Link>

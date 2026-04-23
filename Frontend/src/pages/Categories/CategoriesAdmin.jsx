@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { deconnexion } from "../JS/deconnexion";
 import { useState, useEffect } from "react";
 import { getCategories, formatDateFR } from "../JS/statistiqueCategorie";
+import HeaderAdmin from "../../composants/HeaderDashboard";
 
 function CategoriesAdmin() {
 
@@ -22,30 +22,9 @@ function CategoriesAdmin() {
     <div className="min-h-screen bg-gray-100">
 
       {/* HEADER */}
-      <header className="bg-white shadow p-4 flex flex-col md:flex-row md:justify-between md:items-center">
-        <h1 className="text-xl font-bold mb-4 md:mb-0">
-          Dashboard Catégories
-        </h1>
+      <HeaderAdmin />
 
-        <nav className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
-          <Link to="/Manager" className="text-blue-500 hover:underline">Manager</Link>
-          <Link to="/employes" className="text-blue-500 hover:underline">Employés</Link>
-          <Link to="/Clients" className="text-blue-500 hover:underline">Clients</Link>
-          <Link to="/Comptes" className="text-blue-500 hover:underline">Comptes</Link>
-          <Link to="/Categories" className="text-blue-500 hover:underline">Catégories</Link>
-          <Link to="/Produits" className="text-blue-500 hover:underline">Produits</Link>
-          <Link to="/commandes" className="text-blue-500 hover:underline">Commandes</Link>
-
-          <button
-            onClick={deconnexion}
-            className="ml-4 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Déconnexion
-          </button>
-        </nav>
-      </header>
-
-      {/* TOP SECTION */}
+      {/* TOP */}
       <section className="p-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
 
         <input
@@ -54,9 +33,12 @@ function CategoriesAdmin() {
           className="w-full md:w-1/3 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
-        <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+        <Link
+          to="/AjoutCategorie"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        >
           + Ajouter une catégorie
-        </button>
+        </Link>
 
       </section>
 
@@ -74,10 +56,9 @@ function CategoriesAdmin() {
               <tr>
                 <th className="px-4 py-2 text-left">ID</th>
                 <th className="px-4 py-2 text-left">Nom</th>
-                
-                <th className="px-4 py-2 text-left hidden md:table-cell">Date création</th>
-                <th className="px-4 py-2 text-left hidden md:table-cell">Date modification</th>
-                <th className="px-4 py-2 text-left hidden md:table-cell">Actions</th>
+                <th className="px-4 py-2 hidden md:table-cell">Date création</th>
+                <th className="px-4 py-2 hidden md:table-cell">Date modification</th>
+                <th className="px-4 py-2 hidden md:table-cell">Actions</th>
               </tr>
             </thead>
 
@@ -95,22 +76,30 @@ function CategoriesAdmin() {
                     <td className="px-4 py-2 hidden md:table-cell">
                       {formatDateFR(cat.Date_creation)}
                     </td>
-                   
+
                     <td className="px-4 py-2 hidden md:table-cell">
                       {formatDateFR(cat.Date_modification)}
                     </td>
 
-
+                    {/* ACTIONS */}
                     <td className="px-4 py-2 space-x-2 hidden md:table-cell">
-                      <button className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600">
-                        Voir
-                      </button>
-                      <button className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+
+                      {/* Modifier */}
+                      <Link
+                        to={`/EditerCategorie/${cat.ID_categorie}`}
+                        className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      >
                         Modifier
-                      </button>
-                      <button className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+                      </Link>
+
+                      {/* Supprimer */}
+                      <Link
+                        to={`/DeleteCategorie/${cat.ID_categorie}`}
+                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                      >
                         Supprimer
-                      </button>
+                      </Link>
+
                     </td>
 
                   </tr>

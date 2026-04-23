@@ -1,4 +1,5 @@
 const categorieModel = require("../models/categorie");
+const produitModel = require("../models/produit");
 
 //Creer une categorie
 const createCategorie = async(req, res) =>
@@ -128,34 +129,39 @@ const updateCategorie = async(req, res) =>
 };
 
 //Supprimer une categorie
-const deleteCategorie = async(req, res) =>
-{
-    try
-    {
-        const id = parseInt(req.params.id);
-        if(isNaN(id) || id<=0)
-        {
-            return res.status(400).json({message: "ID invalide"});
-        }
-        else
-        {
-            const categorieexistant = await categorieModel.getCategorieByID(id);
-            if(!categorieexistant)
-            {
-                return res.status(404).json({message: "Catégorie non trouvée"});
-            }
-            else
-            {
-                const categoriesupprimer = await categorieModel.deleteCategorie(id);
-                return res.status(200).json({message: "Catégorie supprimée avec succès", categorie: categoriesupprimer});
-            }
-        }
+const deleteCategorie = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
 
+    if (isNaN(id) || id <= 0) {
+      return res.status(400).json({ message: "ID invalide" });
     }
-    catch(error)
-    {
-        return res.status(500).json({ message: error.message });
+
+    const categorieexistant = await categorieModel.getCategorieByID(id);
+
+    if (!categorieexistant) {
+      return res.status(404).json({ message: "Catégorie non trouvée" });
     }
+
+    // 🔥 VERIFICATION PRODUITS LIÉS
+    const produits = await produitModel.getProduitsByCategorie(id);
+
+    if (produits.length > 0) {
+      return res.status(400).json({
+        message: "Impossible de supprimer : cette catégorie contient des produits"
+      });
+    }
+
+    // ✅ suppression autorisée
+    await categorieModel.deleteCategorie(id);
+
+    return res.status(200).json({
+      message: "Catégorie supprimée avec succès"
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 //Exporter les fonctions

@@ -29,6 +29,12 @@ import AjoutClient from "./pages/Clients/AjoutClient";
 import ProfilClient from "./pages/Clients/ProfilClient";
 import EditerClient from "./pages/Clients/EditerClient";
 import DeleteClient from "./pages/Clients/DeleteClient";
+import AjoutCompte from "./pages/Comptes/AjoutCompte";
+import EditerCompte from "./pages/Comptes/EditerCompte";
+import DeleteCompte from "./pages/Comptes/DeleteCompte";
+import AjoutCategorie from "./pages/Categories/AjoutCategorie"
+import EditerCategorie from "./pages/Categories/EditerCategorie";
+import DeleteCategorie from "./pages/Categories/DeleteCategorie";
 
 
 function App() {
@@ -65,6 +71,12 @@ function App() {
         <Route path="/ProfilClient/:id" element={<ProfilClient />} />
         <Route path="/EditerClient/:id" element={<EditerClient />} />
         <Route path="/DeleteClient/:id" element={<DeleteClient />} />
+        <Route path="/AjoutCompte" element={<AjoutCompte />} />
+        <Route path="/EditerCompte/:id" element={<EditerCompte />} />
+        <Route path="/DeleteCompte/:id" element={<DeleteCompte />} />
+        <Route path="/AjoutCategorie" element={<AjoutCategorie />} />
+        <Route path="/EditerCategorie/:id" element={<EditerCategorie />} />
+        <Route path="/DeleteCategorie/:id" element={<DeleteCategorie />} />
 
       
       </Routes>
