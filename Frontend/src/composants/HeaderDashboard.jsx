@@ -11,14 +11,15 @@ function HeaderAdmin() {
 
       <nav className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
 
-        <Link to="/Manager" className="text-blue-500 hover:underline">Manager</Link>
+        <Link to="/ManagerAdmin" className="text-blue-500 hover:underline">Managers</Link>
         <Link to="/employes" className="text-blue-500 hover:underline">Employés</Link>
         <Link to="/Clients" className="text-blue-500 hover:underline">Clients</Link>
         <Link to="/Comptes" className="text-blue-500 hover:underline">Comptes</Link>
         <Link to="/Categories" className="text-blue-500 hover:underline">Categories</Link>
         <Link to="/Produits" className="text-blue-500 hover:underline">Produits</Link>
-        <Link to="/commandes" className="text-blue-500 hover:underline">Commandes</Link>
-        <Link to="/details" className="text-blue-500 hover:underline">Details</Link>
+        <Link to="/StockAdmin" className="text-blue-500 hover:underline">Stocks</Link>
+        <Link to="/BoutiqueAdmin" className="text-blue-500 hover:underline">Boutiques</Link>
+        
 
         <button
           onClick={deconnexion}

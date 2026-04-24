@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { deconnexion } from "../JS/deconnexion";
 import AjouterAuPanier from "../../composants/AjouterPanier";
 
 
@@ -70,14 +72,43 @@ function ProduitsClient() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      {/* 🔥 HEADER RESPONSIVE */}
+      <header className="bg-white shadow p-4 flex justify-between items-center mb-6">
 
-      <h1 className="text-2xl font-bold mb-4">
+        <h1 className="text-lg md:text-xl font-bold">🛍️ Ma Boutique</h1>
+
+        {/* Desktop */}
+        <nav className="hidden md:flex space-x-6">
+          <Link to="/client/produits" className="text-blue-500">Produits</Link>
+          <Link to="/Panier" className="text-blue-500">Panier</Link> 
+        </nav>
+
+        {/* Mobile button */}
+        <button
+          className="md:hidden"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          ☰
+        </button>
+
+        {/* Déconnexion desktop */}
+        <button
+          onClick={deconnexion}
+          className="hidden md:block px-3 py-1 bg-red-500 text-white rounded"
+        >
+          Déconnexion
+        </button>
+      </header>
+   
+
+
+      <h1 className="text-2xl font-bold mb-4 text-center">
         🛒 Produits par boutique
       </h1>
 
       {/* BOUTIQUE */}
       <select
-        className="border p-2 mb-4 w-full md:w-1/2"
+        className="border p-2 mb-4 w-full md:w-1/2 mx-auto rounded shadow center block"
         value={boutique}
         onChange={(e) => setBoutique(e.target.value)}
       >
@@ -87,14 +118,7 @@ function ProduitsClient() {
         <option value="Dakar - Parcelles">Dakar - Parcelles</option>
       </select>
 
-      {/* RECHERCHE */}
-      <input
-        type="text"
-        placeholder="Rechercher produit..."
-        className="border p-2 w-full md:w-1/2 mb-6"
-        value={recherche}
-        onChange={(e) => setRecherche(e.target.value)}
-      />
+     
 
       {/* ETATS */}
       {!boutique ? (

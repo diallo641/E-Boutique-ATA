@@ -1,5 +1,8 @@
 const boutiqueModel = require('../models/boutique');
 const managerModel = require('../models/manager');
+const employeModel = require('../models/employe');
+const stockModel = require('../models/stock');
+const commandeModel = require('../models/commande');
 
 //Ajouter une boutique
 const ajouterBoutique = async(req, res) =>
@@ -161,32 +164,57 @@ const updateBoutique = async (req, res) => {
 };
 
 //Supprimer une boutique
-const deleteBoutique = async(req, res) =>
-{
-    try
-    {
+const deleteBoutique = async (req, res) => {
+    try {
         const id = parseInt(req.params.id);
-        if(isNaN(id) || id<=0)
-        {
-            return res.status(400).json({message: "ID invalide"});
-        }
-        else
-        {
-            const boutiqueexistant = await boutiqueModel.getBoutiqueByID(id);
-            if(!boutiqueexistant)
-            {
-                return res.status(404).json({message: "Boutique non trouvée"});
-            }
-            else
-            {
-                const boutiquesupprimer = await boutiqueModel.deleteBoutique(id);
-                return res.status(200).json({message: "Boutique supprimée avec succès", boutique: boutiquesupprimer});
-            }
+
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({ message: "ID invalide" });
         }
 
-    }
-    catch(error)
-    {
+        const boutique = await boutiqueModel.getBoutiqueByID(id);
+        if (!boutique) {
+            return res.status(404).json({ message: "Boutique non trouvée" });
+        }
+
+        // 🔥 vérifications relations
+        const employes = await employeModel.getEmployesByBoutiqueID(id);
+        const managers = await managerModel.getManagersByBoutique(id);
+        const stock = await stockModel.getStockByBoutique(id);
+        const commandes = await commandeModel.getCommandesByBoutiqueID(id);
+
+        if (employes.length > 0) {
+            return res.status(409).json({
+                message: "Impossible : employés liés à cette boutique"
+            });
+        }
+
+        if (managers.length > 0) {
+            return res.status(409).json({
+                message: "Impossible : managers liés à cette boutique"
+            });
+        }
+
+        if (stock.length > 0) {
+            return res.status(409).json({
+                message: "Impossible : stock lié à cette boutique"
+            });
+        }
+
+        if (commandes.length > 0) {
+            return res.status(409).json({
+                message: "Impossible : commandes liées à cette boutique"
+            });
+        }
+
+        const result = await boutiqueModel.deleteBoutique(id);
+
+        return res.status(200).json({
+            message: "Boutique supprimée avec succès",
+            boutique: result
+        });
+
+    } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 };

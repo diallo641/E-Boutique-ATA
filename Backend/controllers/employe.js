@@ -405,7 +405,6 @@ const updateEmploye = async (req, res) => {
 
 
 //supprimer un employé
-
 const deleteEmploye = async (req, res) => {
     try {
         const id = parseInt(req.params.id);

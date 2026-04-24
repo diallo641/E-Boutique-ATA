@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { deconnexion } from "../JS/deconnexion";
 
 import {
   obtenirPanier,
@@ -134,7 +136,7 @@ function Panier() {
         if (!resDetail.ok) {
           alert(dataDetail.message || "Erreur stock / détail commande");
 
-          // ⚠️ stop immédiat si erreur stock
+        
           return;
         }
       }
@@ -154,6 +156,26 @@ function Panier() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+
+       {/*  HEADER  */}
+      <header className="bg-white shadow p-4 flex justify-between items-center mb-6">
+
+        <h1 className="text-lg md:text-xl font-bold">🛍️ Ma Boutique</h1>
+
+        {/* Desktop */}
+        <nav className="hidden md:flex space-x-6">
+          <Link to="/client/produits" className="text-blue-500">Produits</Link>
+          <Link to="/Panier" className="text-blue-500">Panier</Link> 
+        </nav>
+
+        {/* Déconnexion desktop */}
+        <button
+          onClick={deconnexion}
+          className="hidden md:block px-3 py-1 bg-red-500 text-white rounded"
+        >
+          Déconnexion
+        </button>
+      </header>
 
       <h1 className="text-2xl font-bold text-center mb-6">
         🛒 Mon Panier

@@ -8,7 +8,7 @@ import Inscription from "./pages/Authentification/Inscription";
 import Reinitialiser_password from "./pages/Authentification/Reinitialiser_password";
 import Panier from "./pages/Accueil/Panier";
 import DashboardAdmin from "./pages/Admin/DashboardAdmin";
-import Managers from "./pages/Managers/managers";
+import Managers from "./pages/Managers/Manager";
 import Employes from "./pages/Employes/employes";
 import DashboardClient from "./pages/Clients/DashboardClient";  
 import Clients from "./pages/Clients/Clients";  
@@ -38,6 +38,19 @@ import DeleteCategorie from "./pages/Categories/DeleteCategorie";
 import Ajoutproduit from "./pages/Produits/AjoutProduit";
 import EditerProduit from "./pages/Produits/EditerProduit";
 import DeleteProduit from "./pages/Produits/DeleteProduit";
+import StockAdmin from "./pages/Stocks/StockAdmin";
+import AjoutStock from "./pages/Stocks/AjouterStock";
+import VoirStock from "./pages/Stocks/VoirStock";
+import EditerStock from "./pages/Stocks/EditerStock";
+import DeleteStock from "./pages/Stocks/DeleteStock";
+import BoutiqueAdmin from "./pages/Boutiques/BoutiqueAdmin";
+import AjoutBoutique from "./pages/Boutiques/AjoutBoutique";
+import VoirBoutique from "./pages/Boutiques/VoirBoutique";
+import EditerBoutique from "./pages/Boutiques/EditerBoutique";
+import DeleteBoutique from "./pages/Boutiques/DeleteBoutique";
+import ManagerAdmin from "./pages/Managers/ManagerAdmin";
+import Manager from "./pages/Managers/Manager";
+
 
 
 function App() {
@@ -83,6 +96,18 @@ function App() {
         <Route path="/AjoutProduit" element={<Ajoutproduit />} />
         <Route path="/EditerProduit/:id" element={<EditerProduit />} />
         <Route path="/DeleteProduit/:id" element={<DeleteProduit />} />
+        <Route path="/StockAdmin" element={<StockAdmin />} />
+        <Route path="/AjoutStock" element={<AjoutStock />} />
+        <Route path="/VoirStock/:ID_produit/:ID_boutique" element={<VoirStock />} />
+        <Route path="/EditerStock/:ID_produit/:ID_boutique" element={<EditerStock />} />
+        <Route path="/DeleteStock/:ID_produit/:ID_boutique" element={<DeleteStock />} />
+        <Route path="/BoutiqueAdmin" element={<BoutiqueAdmin />} />
+        <Route path="/AjoutBoutique" element={<AjoutBoutique />} />
+        <Route path="/VoirBoutique/:id" element={<VoirBoutique />} />
+        <Route path="/EditerBoutique/:id" element={<EditerBoutique />} />
+        <Route path="/DeleteBoutique/:id" element={<DeleteBoutique />} />
+        <Route path="/ManagerAdmin" element={<ManagerAdmin />} />
+        <Route path="/Manager" element={<Manager />} />
 
       
       </Routes>

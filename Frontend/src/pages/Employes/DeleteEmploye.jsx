@@ -20,7 +20,7 @@ function DeleteEmploye() {
       setMessage(res.message);
 
       setTimeout(() => {
-        navigate("/Dashboardadmin");
+        navigate("/employes");
       }, 1500);
     } else {
       setMessage(res.message);

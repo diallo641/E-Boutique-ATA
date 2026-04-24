@@ -12,44 +12,36 @@ const createCommande = async (req, res) => {
         let { Total, Mode_paiement, ID_boutique } = req.body;
 
         // =========================
-        // VALIDATION ROBUSTE
+        // VALIDATION
         // =========================
         Total = Number(Total);
         ID_boutique = Number(ID_boutique);
 
-        if (isNaN(Total) || Total <= 0 || !Mode_paiement || isNaN(ID_boutique)) {
-            return res.status(400).json({ message: "Champs invalides ou incomplets" });
+        if (!Total || Total <= 0 || !Mode_paiement || !ID_boutique) {
+            return res.status(400).json({ message: "Champs invalides" });
         }
 
-        console.log("BODY COMMANDE:", req.body);
-        console.log("USER:", req.user);
+        const ID_client = req.user?.ID_client;
 
-        // =========================
-        // CLIENT
-        // =========================
-        const client = await clientModel.getClientProfile(req.user.ID_compte);
-
-        if (!client) {
-            return res.status(404).json({ message: "Client introuvable" });
+        if (!ID_client) {
+            return res.status(401).json({ message: "Client non authentifié" });
         }
 
         // =========================
-        // BOUTIQUE
+        // BOUTIQUE CHECK
         // =========================
-        console.log("TOKEN USER:", req.user);
         const boutique = await boutiqueModel.getBoutiqueByID(ID_boutique);
 
         if (!boutique) {
             return res.status(404).json({ message: "Boutique inexistante" });
         }
 
+        // =========================
+        // EMPLOYÉ (OPTIONNEL)
+        // =========================
         let ID_employe = null;
 
-        // =========================
-        // EMPLOYE CHECK
-        // =========================
         if (req.user.Nom_role === "Employe") {
-
             const employe = await employeModel.getEmployeByCompteID(req.user.ID_compte);
 
             if (!employe) {
@@ -66,22 +58,17 @@ const createCommande = async (req, res) => {
         // =========================
         // CREATION COMMANDE
         // =========================
-        const nouvelleCommande = await commandeModel.createCommande({
+        const commande = await commandeModel.createCommande({
             Total,
-            Statut_commande: "En attente",
             Mode_paiement,
-            ID_client: client.ID_client,
+            ID_client,
             ID_employe,
             ID_boutique
         });
 
-        if (!nouvelleCommande) {
-            return res.status(500).json({ message: "Erreur création commande" });
-        }
-
         return res.status(201).json({
             message: "Commande créée avec succès",
-            Commande: nouvelleCommande
+            Commande: commande
         });
 
     } catch (error) {
@@ -89,6 +76,9 @@ const createCommande = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+
+
 
 
 // -------------------

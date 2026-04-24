@@ -174,22 +174,21 @@ const getStockByProductAndBoutique = async (req, res) => {
     try {
         const { ID_produit, ID_boutique } = req.params;
 
-        if (req.user.Nom_role === "Manager") {
-            const manager = await managerModel.getManagerByCompteID(req.user.ID_compte);
+        const stock = await stockModel.getStockByProductAndBoutique(
+            ID_produit,
+            ID_boutique
+        );
 
-            if (!manager || manager.ID_boutique != ID_boutique) {
-                return res.status(403).json({ message: "Accès interdit" });
-            }
-        }
-
-        if (req.user.Nom_role === "Employe" && req.user.ID_boutique != ID_boutique) {
-            return res.status(403).json({ message: "Accès interdit" });
-        }
-
-        const stock = await stockModel.getStockByProductAndBoutique(ID_produit, ID_boutique);
-
+        // ✅ au lieu de 404 brut
         if (!stock) {
-            return res.status(404).json({ message: "Stock non trouvé" });
+            return res.status(200).json({
+                message: "Stock vide",
+                Stock: {
+                    ID_produit,
+                    ID_boutique,
+                    Quantite: 0
+                }
+            });
         }
 
         return res.status(200).json({

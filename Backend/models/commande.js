@@ -3,19 +3,35 @@ const db = require('../config/db');
 // -------------------
 // Créer une commande
 // -------------------
-const createCommande = async ({ Total, Statut_commande = 'En cours', Mode_paiement, ID_client, ID_employe, ID_boutique }) => {
+const createCommande = async (data) => {
+    const {
+        Total,
+        Statut_commande = 'En attente',
+        Mode_paiement,
+        ID_client,
+        ID_employe = null,
+        ID_boutique
+    } = data;
+
+    // 🔥 force sécurité des types
+    const values = [
+        Number(Total),
+        Statut_commande,
+        Mode_paiement,
+        Number(ID_client),
+        ID_employe ? Number(ID_employe) : null,
+        Number(ID_boutique)
+    ];
+
     const [result] = await db.query(
-        "INSERT INTO commande (Total, Statut_commande, Mode_paiement, Date_commande, Date_modification, ID_client, ID_employe, ID_boutique) VALUES (?, ?, ?, NOW(), NOW(), ?, ?, ?)",
-        [Total, Statut_commande, Mode_paiement, ID_client, ID_employe, ID_boutique]
-        
+        `INSERT INTO commande 
+        (Total, Statut_commande, Mode_paiement, ID_client, ID_employe, ID_boutique, Date_commande, Date_modification)
+        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+        values
     );
-    const test = await db.query("SELECT * FROM commande WHERE ID_commande = ?", [result.insertId]);
-   console.log("VERIFICATION INSERT:", test[0]);
 
     const ID_commande = result.insertId;
-    console.log("RESULT INSERT:", result);
 
-    // 🔥 Génération référence
     const annee = new Date().getFullYear();
     const Reference_commande = `CMD-${annee}-${String(ID_commande).padStart(5, '0')}`;
 
@@ -24,19 +40,14 @@ const createCommande = async ({ Total, Statut_commande = 'En cours', Mode_paieme
         [Reference_commande, ID_commande]
     );
 
-    return {
-        ID_commande,
-        Reference_commande,
-        Total,
-        Statut_commande,
-        Mode_paiement,
-        Date_commande: new Date(),
-        Date_modification: new Date(),
-        ID_boutique,
-        ID_employe,
-        ID_client
-    };
+    const [rows] = await db.query(
+        "SELECT * FROM commande WHERE ID_commande = ?",
+        [ID_commande]
+    );
+
+    return rows[0];
 };
+
 
 // -------------------
 // ADMIN
